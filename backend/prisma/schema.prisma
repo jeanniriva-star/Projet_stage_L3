@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ======================================================
+// ENUMS
+// ======================================================
+
+enum Role {
+  ADMIN
+  FORMATEUR
+  APPRENANT
+}
+
+enum StatutInscription {
+  EN_ATTENTE
+  VALIDEE
+  REFUSEE
+}
+
+enum TypeEvaluation {
+  QCM
+  DEVOIR
+}
+
+enum StatutSession {
+  NON_DEMARREE
+  EN_COURS
+  TERMINEE
+}
+// ======================================================
+// USER
+// ======================================================
+
+model User {
+  id        String @id @default(uuid())
+  nom       String
+  prenom    String
+  email     String @unique
+  password  String
+  telephone String
+  adresse   String
+
+  role Role @default(APPRENANT)
+
+  formationsCreees Formation[]            @relation("CreateurFormation")
+  affectations     AffectationFormateur[]
+  inscriptions     Inscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ======================================================
+// FORMATION
+// ======================================================
+
+model Formation {
+  id          String  @id @default(uuid())
+  titre       String
+  description String?
+
+  createurId String
+  createur   User   @relation("CreateurFormation", fields: [createurId], references: [id])
+
+  affectations AffectationFormateur[]
+  cours        Cours[]
+  sessions     Session[]
+  inscriptions Inscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ======================================================
+// AFFECTATION FORMATEUR
+// ======================================================
+
+model AffectationFormateur {
+  id String @id @default(uuid())
+
+  formationId String
+  formateurId String
+
+  formation Formation @relation(fields: [formationId], references: [id])
+  formateur User      @relation(fields: [formateurId], references: [id])
+
+  @@unique([formationId, formateurId])
+}
+
+// ======================================================
+// COURS
+// ======================================================
+
+model Cours {
+  id          String  @id @default(uuid())
+  titre       String
+  description String?
+  ordre       Int
+
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id])
+
+  ressources       RessourcePedagogique[]
+  evaluations      Evaluation[]
+  progressionCours ProgressionCours[]
+  exercices Exercice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([formationId, ordre])
+}
+
+model Exercice {
+  id          String   @id @default(uuid())
+  titre       String
+  description String?
+  type        String
+  url         String
+
+  coursId     String
+  cours       Cours    @relation(fields: [coursId], references: [id])
+
+  createdAt   DateTime @default(now())
+}
+
+// ======================================================
+// RESSOURCE PEDAGOGIQUE
+// ======================================================
+
+model RessourcePedagogique {
+  id   String @id @default(uuid())
+  nom  String
+  type String
+  url  String
+
+  coursId String
+  cours   Cours  @relation(fields: [coursId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// ======================================================
+// SESSION JITSI
+// ======================================================
+
+model Session {
+  id          String  @id @default(uuid())
+  titre       String
+  description String?
+
+  dateDebut DateTime
+  dateFin   DateTime
+
+  roomName String @unique
+
+  statut StatutSession @default(NON_DEMARREE)
+
+  startedAt DateTime?
+  endedAt   DateTime?
+
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id])
+
+  presences Presence[]
+
+  createdAt DateTime @default(now())
+}
+
+// ======================================================
+// INSCRIPTION
+// ======================================================
+
+model Inscription {
+  id String @id @default(uuid())
+
+  apprenantId String
+  formationId String
+
+  apprenant User      @relation(fields: [apprenantId], references: [id])
+  formation Formation @relation(fields: [formationId], references: [id])
+
+  statut StatutInscription @default(EN_ATTENTE)
+
+  dateInscription DateTime @default(now())
+
+  presences    Presence[]
+  progressions ProgressionCours[]
+  soumissions  SoumissionEvaluation[]
+
+  @@unique([apprenantId, formationId])
+}
+
+// ======================================================
+// PRESENCE
+// ======================================================
+
+model Presence {
+  id String @id @default(uuid())
+
+  inscriptionId String
+  sessionId     String
+
+  inscription Inscription @relation(fields: [inscriptionId], references: [id])
+  session     Session     @relation(fields: [sessionId], references: [id])
+
+  present Boolean @default(false)
+
+  dateMarquage DateTime @default(now())
+
+  @@unique([inscriptionId, sessionId])
+}
+
+// ======================================================
+// PROGRESSION COURS
+// ======================================================
+
+model ProgressionCours {
+  id String @id @default(uuid())
+
+  inscriptionId String
+  coursId       String
+
+  inscription Inscription @relation(fields: [inscriptionId], references: [id])
+  cours       Cours       @relation(fields: [coursId], references: [id])
+
+  termine Boolean @default(false)
+
+  dateCompletion DateTime?
+
+  @@unique([inscriptionId, coursId])
+}
+
+// ======================================================
+// EVALUATION
+// ======================================================
+
+model Evaluation {
+  id String @id @default(uuid())
+
+  titre       String
+  description String?
+
+  type TypeEvaluation
+
+  coursId String
+  cours   Cours  @relation(fields: [coursId], references: [id])
+
+  questions   Question[]
+  soumissions SoumissionEvaluation[]
+
+  createdAt DateTime @default(now())
+}
+
+// ======================================================
+// QUESTION
+// ======================================================
+
+model Question {
+  id String @id @default(uuid())
+
+  contenu String
+
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+
+  choix    Choix[]
+  reponses ReponseQCM[]
+}
+
+// ======================================================
+// CHOIX
+// ======================================================
+
+model Choix {
+  id String @id @default(uuid())
+
+  texte   String
+  correct Boolean @default(false)
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  reponses ReponseQCM[]
+}
+
+// ======================================================
+// SOUMISSION EVALUATION
+// ======================================================
+
+model SoumissionEvaluation {
+  id String @id @default(uuid())
+
+  inscriptionId String
+  evaluationId  String
+
+  inscription Inscription @relation(fields: [inscriptionId], references: [id])
+  evaluation  Evaluation  @relation(fields: [evaluationId], references: [id])
+
+  note Float?
+
+  dateSoumission DateTime @default(now())
+
+  reponses ReponseQCM[]
+
+  @@unique([inscriptionId, evaluationId])
+}
+
+// ======================================================
+// REPONSE QCM
+// ======================================================
+
+model ReponseQCM {
+  id String @id @default(uuid())
+
+  soumissionId String
+  questionId   String
+  choixId      String
+
+  soumission SoumissionEvaluation @relation(fields: [soumissionId], references: [id])
+  question   Question             @relation(fields: [questionId], references: [id])
+  choix      Choix                @relation(fields: [choixId], references: [id])
+
+  @@unique([soumissionId, questionId])
+}

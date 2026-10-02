@@ -1,0 +1,20 @@
+import { Router } from "express";
+import { createEvaluationQCM, addQuestion, getQCMForApprenant, soumettreQCM, getMesResultats, getResultatsEvaluation, updateEvaluation, deleteEvaluation, updateQuestion, deleteQuestion, getEvaluationsByFormation, getEvaluationDetail, getMesEvaluations, } from "./evaluation.controller.js";
+import { authenticate } from "../../middlewares/auth.middleware.js";
+import { authorize } from "../../middlewares/role.middleware.js";
+const router = Router();
+router.post("/cours/:coursId/evaluations", authenticate, authorize("FORMATEUR"), createEvaluationQCM);
+router.post("/evaluations/:evaluationId/questions", authenticate, authorize("FORMATEUR"), addQuestion);
+router.get("/evaluations/:evaluationId/qcm", authenticate, authorize("APPRENANT"), getQCMForApprenant);
+router.post("/evaluations/:evaluationId/soumissions", authenticate, authorize("APPRENANT"), soumettreQCM);
+router.get("/evaluations/mes-resultats", authenticate, authorize("APPRENANT"), getMesResultats);
+router.get("/evaluations/:evaluationId/resultats", authenticate, authorize("FORMATEUR", "ADMIN"), getResultatsEvaluation);
+router.patch("/evaluations/:evaluationId", authenticate, authorize("FORMATEUR"), updateEvaluation);
+router.delete("/evaluations/:evaluationId", authenticate, authorize("FORMATEUR"), deleteEvaluation);
+router.patch("/questions/:questionId", authenticate, authorize("FORMATEUR"), updateQuestion);
+router.delete("/questions/:questionId", authenticate, authorize("FORMATEUR"), deleteQuestion);
+router.get("/formations/:formationId/evaluations", authenticate, authorize("ADMIN", "FORMATEUR"), getEvaluationsByFormation);
+router.get("/evaluations/mes-evaluations", authenticate, authorize("APPRENANT"), getMesEvaluations);
+router.get("/evaluations/:evaluationId", authenticate, authorize("ADMIN", "FORMATEUR"), getEvaluationDetail);
+export default router;
+//# sourceMappingURL=evaluation.routes.js.map
