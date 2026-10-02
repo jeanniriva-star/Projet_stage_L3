@@ -23,3 +23,8 @@ export const registerSchema = z.object({
 
   adresse: z.string().trim().min(3, "Adresse trop courte"),
 });
+
+export const loginSchema = z.object({
+  email: z.email("Email invalide"),
+  password: z.string().min(1, "Le mot de passe est requis"),
+});

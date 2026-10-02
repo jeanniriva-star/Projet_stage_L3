@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import { useAuth } from "../../hooks/useAuth";
 import { inscrireFormation } from "../../services/inscription.service";
 import logoSprayInfo from "../../assets/logo_spray.jpg";
+import { isValidEmail } from "../../utils/validation";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -15,9 +17,15 @@ function LoginPage() {
   const { loginUser } = useAuth();
   const [searchParams] = useSearchParams();
   const formationId = searchParams.get("formationId");
+  const [erreurEmail, setErreurEmail] = useState("");
+  const [afficherMdp, setAfficherMdp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidEmail(email)) {
+  setErreurEmail("Format d'email invalide (exemple : nom@domaine.com)");
+  return;
+}
 
     setErreur("");
     setChargement(true);
@@ -91,7 +99,7 @@ return (
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} noValidate className="space-y-5">
         
         <div>
           <label
@@ -102,17 +110,23 @@ return (
           </label>
 
           <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="exemple@email.com"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-white
-                       text-slate-900 placeholder:text-slate-400
-                       focus:outline-none focus:ring-2 focus:ring-cyan-500
-                       focus:border-cyan-500 transition"
-          />
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErreurEmail("");
+              }}
+              required
+              placeholder="exemple@email.com"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-white
+                        text-slate-900 placeholder:text-slate-400
+                        focus:outline-none focus:ring-2 focus:ring-cyan-500
+                        focus:border-cyan-500 transition"
+            />
+            {erreurEmail && (
+              <p className="mt-2 text-sm text-red-600">{erreurEmail}</p>
+            )}
         </div>
 
         <div>
@@ -123,18 +137,30 @@ return (
             Mot de passe
           </label>
 
-          <input
-            id="password"
-            type="password"
-            value={motDePasse}
-            onChange={(e) => setMotDePasse(e.target.value)}
-            required
-            placeholder="Votre mot de passe"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-white
-                       text-slate-900 placeholder:text-slate-400
-                       focus:outline-none focus:ring-2 focus:ring-cyan-500
-                       focus:border-cyan-500 transition"
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={afficherMdp ? "text" : "password"}
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              required
+              placeholder="Votre mot de passe"
+              className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-white
+                        text-slate-900 placeholder:text-slate-400
+                        focus:outline-none focus:ring-2 focus:ring-cyan-500
+                        focus:border-cyan-500 transition"
+            />
+
+            <button
+              type="button"
+              onClick={() => setAfficherMdp(!afficherMdp)}
+              aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+              className="absolute inset-y-0 right-0 flex items-center px-4
+                        text-slate-400 hover:text-slate-600"
+            >
+              {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
         {erreur && (
