@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { onlyLetters, onlyPhone,isValidName, isValidEmail,isValidPassword,isValidPhone,} from "../../utils/validation";
+import { Eye, EyeOff } from "lucide-react";
+import {
+  onlyLetters,
+  onlyPhone,
+  onlyEmailChars,
+  isValidName,
+  isValidEmailInscription,
+  isValidPassword,
+  isValidPhone,
+} from "../../utils/validation";
 
 import { register } from "../../services/auth.service";
 
@@ -20,6 +29,7 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [erreurs, setErreurs] = useState<Record<string, string>>({});
+  const [afficherMdp, setAfficherMdp] = useState(false);
 
 const effacerErreur = (champ: string) =>
   setErreurs((prev) => ({ ...prev, [champ]: "" }));
@@ -30,7 +40,7 @@ const effacerErreur = (champ: string) =>
 
 if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
 if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
-if (!isValidEmail(email)) nouvellesErreurs.email = "Format invalide (exemple : nom@gmail.com)";
+if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@gmail.com)";
 if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
 if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
 if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
@@ -124,7 +134,7 @@ setErreurs({});
             placeholder="Adresse e-mail"
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setEmail(onlyEmailChars(e.target.value));
               effacerErreur("email");
             }}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -134,17 +144,32 @@ setErreurs({});
         </div>
 
         <div>
-          <input
-            type="password"
-            placeholder="Mot de passe (8 caractères minimum)"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              effacerErreur("password");
-            }}
-            className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            required
-          />
+          <div>
+            <div className="relative">
+              <input
+                type={afficherMdp ? "text" : "password"}
+                placeholder="Mot de passe (8 caractères minimum)"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  effacerErreur("password");
+                }}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12"
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() => setAfficherMdp(!afficherMdp)}
+                aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                className="absolute inset-y-0 right-0 flex items-center px-4
+                          text-slate-400 hover:text-slate-600"
+              >
+                {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
+          </div>
           {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
         </div>
 

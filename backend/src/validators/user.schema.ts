@@ -13,7 +13,13 @@ export const registerSchema = z.object({
     .min(2, "Le prénom doit contenir au moins 2 caractères")
     .regex(/^[\p{L}\s'-]+$/u, "Le prénom ne doit contenir que des lettres"),
 
-  email: z.email("Email invalide"),
+email: z
+  .string()
+  .trim()
+  .regex(
+    /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/,
+    "Email invalide (lettres et chiffres uniquement)"
+  ),
 
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
 
