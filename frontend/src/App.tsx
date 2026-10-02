@@ -41,6 +41,7 @@ import MesFormationsFormateurPage from "./pages/formateur/MesFormationsFormateur
 import FormateurDashboard from "./pages/formateur/FormateurDashboard";
 import MesCoursFormateurPage from "./pages/formateur/MesCoursFormateurPage";
 import SessionsFormateurPage from "./pages/formateur/SessionsFormateurPage";
+import AdminLayout from "./layouts/AdminLayout";
 
 
 function App() {
@@ -80,53 +81,44 @@ function App() {
             <ProtectedRoute allowedRoles={["ADMIN"]} />
           }
         >
-          <Route
-            path="/admin"
-            element={<AdminDashboard />}
-          />
-          <Route
-            path="/admin/inscriptions"
-            element={
-              <InscriptionsAdminPage />
-            }
-          />
-          <Route
-            path="/admin/utilisateurs"
-            element={
-              <UtilisateursAdminPage />
-            }
-          />
-          <Route
-            path="/admin/affectations"
-            element={
-              <AffectationsAdminPage />
-            }
-          />
-          <Route
-            path="/admin/formations"
-            element={
-              <FormationsAdminPage />
-            }
-          />
-          <Route
-            path="/admin/formations/:formationId"
-            element={
-              <FormationDetailAdminPage />
-            }
-          />
-         <Route
-            path="/admin/formations/:formationId/cours/:coursId"
-            element={
-              <CoursDetailAdminPage />
-            }
-          />
-          <Route
-              path="/admin/formations/:formationId/cours/:coursId/evaluations/:evaluationId"
-              element={
-                <EvaluationDetailAdminPage />
-              }
+          <Route element={<AdminLayout />}>
+            <Route
+              path="/admin"
+              element={<AdminDashboard />}
             />
-            <Route path="/admin/profil" element={<ProfilPage />} />
+            <Route
+              path="/admin/inscriptions"
+              element={<InscriptionsAdminPage />}
+            />
+            <Route
+              path="/admin/utilisateurs"
+              element={<UtilisateursAdminPage />}
+            />
+            <Route
+              path="/admin/affectations"
+              element={<AffectationsAdminPage />}
+            />
+            <Route
+              path="/admin/formations"
+              element={<FormationsAdminPage />}
+            />
+            <Route
+              path="/admin/formations/:formationId"
+              element={<FormationDetailAdminPage />}
+            />
+            <Route
+              path="/admin/formations/:formationId/cours/:coursId"
+              element={<CoursDetailAdminPage />}
+            />
+            <Route
+              path="/admin/formations/:formationId/cours/:coursId/evaluations/:evaluationId"
+              element={<EvaluationDetailAdminPage />}
+            />
+            <Route
+              path="/admin/profil"
+              element={<ProfilPage />}
+            />
+          </Route>
         </Route>
 
     {/* FORMATEUR */}

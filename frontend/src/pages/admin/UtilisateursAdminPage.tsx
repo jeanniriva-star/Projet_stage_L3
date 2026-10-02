@@ -3,8 +3,18 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import axios from "axios";
+import {
+  onlyLetters,
+  onlyPhone,
+  onlyEmailChars,
+  isValidName,
+  isValidEmailInscription,
+  isValidPassword,
+  isValidPhone,
+} from "../../utils/validation";
 
 import {
   checkUserDeletionAdmin,
@@ -84,6 +94,11 @@ function UtilisateursAdminPage() {
 
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
+  const [erreurs, setErreurs] = useState<Record<string, string>>({});
+  const [afficherMdp, setAfficherMdp] = useState(false);
+
+const effacerErreur = (champ: string) =>
+  setErreurs((prev) => ({ ...prev, [champ]: "" }));
   const [
   verificationData,
   setVerificationData,
@@ -266,6 +281,8 @@ const [
     setAdresse("");
     setRoleCreation("FORMATEUR");
     setCreateError("");
+    setErreurs({});
+    setAfficherMdp(false);
   }
 
   // =====================================================
@@ -277,20 +294,21 @@ const [
   ) {
     event.preventDefault();
 
-    if (
-      !nom.trim() ||
-      !prenom.trim() ||
-      !email.trim() ||
-      !password ||
-      !telephone.trim() ||
-      !adresse.trim()
-    ) {
-      setCreateError(
-        "Tous les champs sont obligatoires."
-      );
+   const nouvellesErreurs: Record<string, string> = {};
 
-      return;
-    }
+if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
+if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
+if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
+if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
+if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
+if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
+
+if (Object.keys(nouvellesErreurs).length > 0) {
+  setErreurs(nouvellesErreurs);
+  return;
+}
+
+setErreurs({});
 
     try {
       setCreating(true);
@@ -593,174 +611,141 @@ async function handleConfirmationFinale() {
               ou formateur.
             </p>
 
-            <form
-              onSubmit={
-                handleCreerUtilisateur
-              }
-              className="mt-6"
-            >
-              <div className="grid gap-5 md:grid-cols-2">
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Nom
-                  </label>
-
-                  <input
-                    type="text"
-                    value={nom}
-                    onChange={(event) =>
-                      setNom(
-                        event.target.value
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Prénom
-                  </label>
-
-                  <input
-                    type="text"
-                    value={prenom}
-                    onChange={(event) =>
-                      setPrenom(
-                        event.target.value
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Email
-                  </label>
-
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(event) =>
-                      setEmail(
-                        event.target.value
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Téléphone
-                  </label>
-
-                  <input
-                    type="text"
-                    value={telephone}
-                    onChange={(event) =>
-                      setTelephone(
-                        event.target.value
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Adresse
-                  </label>
-
-                  <input
-                    type="text"
-                    value={adresse}
-                    onChange={(event) =>
-                      setAdresse(
-                        event.target.value
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
-                    Rôle
-                  </label>
-
-                  <select
-                    value={roleCreation}
-                    onChange={(event) =>
-                      setRoleCreation(
-                        event.target.value as
-                          | "ADMIN"
-                          | "FORMATEUR"
-                      )
-                    }
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
-                  >
-                    <option value="FORMATEUR">
-                      Formateur
-                    </option>
-
-                    <option value="ADMIN">
-                      Administrateur
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Mot de passe
-                </label>
-
+          <form onSubmit={handleCreerUtilisateur} noValidate className="mt-6">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Nom</label>
                 <input
-                  type="password"
-                  value={password}
-                  onChange={(event) =>
-                    setPassword(
-                      event.target.value
-                    )
-                  }
+                  type="text"
+                  value={nom}
+                  onChange={(e) => {
+                    setNom(onlyLetters(e.target.value));
+                    effacerErreur("nom");
+                  }}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
                 />
+                {erreurs.nom && <p className="mt-1 text-sm text-red-600">{erreurs.nom}</p>}
               </div>
 
-              {createError && (
-                <p className="mt-4 text-sm text-red-600">
-                  {createError}
-                </p>
-              )}
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetCreation();
-                    setShowCreateForm(
-                      false
-                    );
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Prénom</label>
+                <input
+                  type="text"
+                  value={prenom}
+                  onChange={(e) => {
+                    setPrenom(onlyLetters(e.target.value));
+                    effacerErreur("prenom");
                   }}
-                  className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  Annuler
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={creating}
-                  className="rounded-xl bg-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {creating
-                    ? "Création..."
-                    : "Créer"}
-                </button>
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                />
+                {erreurs.prenom && <p className="mt-1 text-sm text-red-600">{erreurs.prenom}</p>}
               </div>
-            </form>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(onlyEmailChars(e.target.value));
+                    effacerErreur("email");
+                  }}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                />
+                {erreurs.email && <p className="mt-1 text-sm text-red-600">{erreurs.email}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Téléphone</label>
+                <input
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => {
+                    setTelephone(onlyPhone(e.target.value));
+                    effacerErreur("telephone");
+                  }}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                />
+                {erreurs.telephone && <p className="mt-1 text-sm text-red-600">{erreurs.telephone}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Adresse</label>
+                <input
+                  type="text"
+                  value={adresse}
+                  onChange={(e) => {
+                    setAdresse(e.target.value);
+                    effacerErreur("adresse");
+                  }}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                />
+                {erreurs.adresse && <p className="mt-1 text-sm text-red-600">{erreurs.adresse}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Rôle</label>
+                <select
+                  value={roleCreation}
+                  onChange={(e) => setRoleCreation(e.target.value as "ADMIN" | "FORMATEUR")}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                >
+                  <option value="FORMATEUR">Formateur</option>
+                  <option value="ADMIN">Administrateur</option>
+                </select>
+              </div>
+            </div>
+                <div className="mt-5">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Mot de passe</label>
+
+                  <div className="relative">
+                    <input
+                      type={afficherMdp ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        effacerErreur("password");
+                      }}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-cyan-600"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setAfficherMdp(!afficherMdp)}
+                      aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                      className="absolute inset-y-0 right-0 flex items-center px-4
+                                text-slate-400 hover:text-slate-600"
+                    >
+                      {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+
+                  {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
+                </div>
+
+            {createError && <p className="mt-4 text-sm text-red-600">{createError}</p>}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  resetCreation();
+                  setShowCreateForm(false);
+                }}
+                className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Annuler
+              </button>
+
+              <button
+                type="submit"
+                disabled={creating}
+                className="rounded-xl bg-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {creating ? "Création..." : "Créer"}
+              </button>
+            </div>
+          </form>
           </section>
         )}
 
@@ -1140,11 +1125,6 @@ async function handleConfirmationFinale() {
               </div>
             </div>
           )}
-
-
-
-
-
 
 {showVerificationDetails &&
   verificationData &&

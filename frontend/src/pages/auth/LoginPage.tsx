@@ -23,7 +23,7 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidEmail(email)) {
-  setErreurEmail("Format d'email invalide (exemple : nom@gmail.com)");
+  setErreurEmail("Format d'email invalide (exemple : nom@domaine.com)");
   return;
 }
 

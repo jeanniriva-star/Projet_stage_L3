@@ -34,3 +34,32 @@ export const loginSchema = z.object({
   email: z.email("Email invalide"),
   password: z.string().min(1, "Le mot de passe est requis"),
 });
+
+export const createUserAdminSchema = registerSchema.extend({
+  role: z.enum(["ADMIN", "FORMATEUR"], "Rôle invalide"),
+});
+
+export const updateProfilSchema = registerSchema
+  .pick({
+    nom: true,
+    prenom: true,
+    email: true,
+    telephone: true,
+    adresse: true,
+  })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Aucune modification n'a été fournie",
+  });
+
+export const changerMotDePasseSchema = z
+  .object({
+    ancienMotDePasse: z.string().min(1, "L'ancien mot de passe est obligatoire"),
+    nouveauMotDePasse: z
+      .string()
+      .min(8, "Le nouveau mot de passe doit contenir au moins 8 caractères"),
+  })
+  .refine((data) => data.ancienMotDePasse !== data.nouveauMotDePasse, {
+    message: "Le nouveau mot de passe doit être différent de l'ancien",
+    path: ["nouveauMotDePasse"],
+  });

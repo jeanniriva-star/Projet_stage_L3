@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import {
   getMonProfil,
@@ -6,12 +7,53 @@ import {
   changerMotDePasse,
   type MonProfil,
 } from "../services/user.service";
+import {
+  onlyLetters,
+  onlyPhone,
+  onlyEmailChars,
+  isValidName,
+  isValidEmailInscription,
+  isValidPhone,
+  isValidPassword,
+} from "../utils/validation";
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administrateur",
   FORMATEUR: "Formateur",
   APPRENANT: "Apprenant",
 };
+
+// Champ mot de passe avec bouton afficher / cacher
+function PasswordInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [afficher, setAfficher] = useState(false);
+
+  return (
+    <div className="relative">
+      <input
+        type={afficher ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12"
+      />
+
+      <button
+        type="button"
+        onClick={() => setAfficher(!afficher)}
+        aria-label={afficher ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+        className="absolute inset-y-0 right-0 flex items-center px-4
+                   text-slate-400 hover:text-slate-600"
+      >
+        {afficher ? <EyeOff size={20} /> : <Eye size={20} />}
+      </button>
+    </div>
+  );
+}
 
 function ProfilPage() {
   const { updateUser } = useAuth();
@@ -28,6 +70,7 @@ function ProfilPage() {
   const [savingInfo, setSavingInfo] = useState(false);
   const [infoError, setInfoError] = useState("");
   const [infoSuccess, setInfoSuccess] = useState("");
+  const [erreursInfo, setErreursInfo] = useState<Record<string, string>>({});
 
   const [ancienMotDePasse, setAncienMotDePasse] = useState("");
   const [nouveauMotDePasse, setNouveauMotDePasse] = useState("");
@@ -35,6 +78,13 @@ function ProfilPage() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [erreursMdp, setErreursMdp] = useState<Record<string, string>>({});
+
+  const effacerErreurInfo = (champ: string) =>
+    setErreursInfo((prev) => ({ ...prev, [champ]: "" }));
+
+  const effacerErreurMdp = (champ: string) =>
+    setErreursMdp((prev) => ({ ...prev, [champ]: "" }));
 
   useEffect(() => {
     async function charger() {
@@ -60,10 +110,22 @@ function ProfilPage() {
     setInfoError("");
     setInfoSuccess("");
 
-    if (!nom.trim() || !prenom.trim() || !email.trim() || !telephone.trim() || !adresse.trim()) {
-      setInfoError("Tous les champs sont obligatoires.");
+    const nouvellesErreurs: Record<string, string> = {};
+
+    if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
+    if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
+    if (!isValidEmailInscription(email))
+      nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
+    if (!isValidPhone(telephone))
+      nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
+    if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
+
+    if (Object.keys(nouvellesErreurs).length > 0) {
+      setErreursInfo(nouvellesErreurs);
       return;
     }
+
+    setErreursInfo({});
 
     try {
       setSavingInfo(true);
@@ -101,20 +163,28 @@ function ProfilPage() {
     setPasswordError("");
     setPasswordSuccess("");
 
-    if (!ancienMotDePasse || !nouveauMotDePasse || !confirmationMotDePasse) {
-      setPasswordError("Tous les champs sont obligatoires.");
+    const nouvellesErreurs: Record<string, string> = {};
+
+    if (!ancienMotDePasse) nouvellesErreurs.ancien = "Le mot de passe actuel est obligatoire";
+
+    if (!isValidPassword(nouveauMotDePasse)) {
+      nouvellesErreurs.nouveau = "Minimum 8 caractères";
+    } else if (nouveauMotDePasse === ancienMotDePasse) {
+      nouvellesErreurs.nouveau = "Doit être différent du mot de passe actuel";
+    }
+
+    if (!confirmationMotDePasse) {
+      nouvellesErreurs.confirmation = "Veuillez confirmer le nouveau mot de passe";
+    } else if (nouveauMotDePasse !== confirmationMotDePasse) {
+      nouvellesErreurs.confirmation = "La confirmation ne correspond pas";
+    }
+
+    if (Object.keys(nouvellesErreurs).length > 0) {
+      setErreursMdp(nouvellesErreurs);
       return;
     }
 
-    if (nouveauMotDePasse.length < 8) {
-      setPasswordError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-
-    if (nouveauMotDePasse !== confirmationMotDePasse) {
-      setPasswordError("La confirmation ne correspond pas au nouveau mot de passe.");
-      return;
-    }
+    setErreursMdp({});
 
     try {
       setSavingPassword(true);
@@ -155,6 +225,7 @@ function ProfilPage() {
         {/* Informations personnelles */}
         <form
           onSubmit={handleSubmitInfo}
+          noValidate
           className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
         >
           <h2 className="text-lg font-bold text-slate-900">Informations personnelles</h2>
@@ -165,9 +236,15 @@ function ProfilPage() {
               <input
                 type="text"
                 value={prenom}
-                onChange={(e) => setPrenom(e.target.value)}
+                onChange={(e) => {
+                  setPrenom(onlyLetters(e.target.value));
+                  effacerErreurInfo("prenom");
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3"
               />
+              {erreursInfo.prenom && (
+                <p className="mt-1 text-sm text-red-600">{erreursInfo.prenom}</p>
+              )}
             </div>
 
             <div>
@@ -175,9 +252,15 @@ function ProfilPage() {
               <input
                 type="text"
                 value={nom}
-                onChange={(e) => setNom(e.target.value)}
+                onChange={(e) => {
+                  setNom(onlyLetters(e.target.value));
+                  effacerErreurInfo("nom");
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3"
               />
+              {erreursInfo.nom && (
+                <p className="mt-1 text-sm text-red-600">{erreursInfo.nom}</p>
+              )}
             </div>
 
             <div className="sm:col-span-2">
@@ -185,9 +268,15 @@ function ProfilPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(onlyEmailChars(e.target.value));
+                  effacerErreurInfo("email");
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3"
               />
+              {erreursInfo.email && (
+                <p className="mt-1 text-sm text-red-600">{erreursInfo.email}</p>
+              )}
             </div>
 
             <div>
@@ -195,11 +284,17 @@ function ProfilPage() {
                 Téléphone
               </label>
               <input
-                type="text"
+                type="tel"
                 value={telephone}
-                onChange={(e) => setTelephone(e.target.value)}
+                onChange={(e) => {
+                  setTelephone(onlyPhone(e.target.value));
+                  effacerErreurInfo("telephone");
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3"
               />
+              {erreursInfo.telephone && (
+                <p className="mt-1 text-sm text-red-600">{erreursInfo.telephone}</p>
+              )}
             </div>
 
             <div>
@@ -207,9 +302,15 @@ function ProfilPage() {
               <input
                 type="text"
                 value={adresse}
-                onChange={(e) => setAdresse(e.target.value)}
+                onChange={(e) => {
+                  setAdresse(e.target.value);
+                  effacerErreurInfo("adresse");
+                }}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3"
               />
+              {erreursInfo.adresse && (
+                <p className="mt-1 text-sm text-red-600">{erreursInfo.adresse}</p>
+              )}
             </div>
           </div>
 
@@ -230,6 +331,7 @@ function ProfilPage() {
         {/* Mot de passe */}
         <form
           onSubmit={handleSubmitPassword}
+          noValidate
           className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
         >
           <h2 className="text-lg font-bold text-slate-900">Changer le mot de passe</h2>
@@ -239,37 +341,50 @@ function ProfilPage() {
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Mot de passe actuel
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={ancienMotDePasse}
-                onChange={(e) => setAncienMotDePasse(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                onChange={(v) => {
+                  setAncienMotDePasse(v);
+                  effacerErreurMdp("ancien");
+                }}
               />
+              {erreursMdp.ancien && (
+                <p className="mt-1 text-sm text-red-600">{erreursMdp.ancien}</p>
+              )}
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Nouveau mot de passe
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={nouveauMotDePasse}
-                onChange={(e) => setNouveauMotDePasse(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                onChange={(v) => {
+                  setNouveauMotDePasse(v);
+                  effacerErreurMdp("nouveau");
+                }}
               />
-              <p className="mt-1 text-xs text-slate-500">Au moins 8 caractères.</p>
+              {erreursMdp.nouveau ? (
+                <p className="mt-1 text-sm text-red-600">{erreursMdp.nouveau}</p>
+              ) : (
+                <p className="mt-1 text-xs text-slate-500">Au moins 8 caractères.</p>
+              )}
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Confirmer le nouveau mot de passe
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={confirmationMotDePasse}
-                onChange={(e) => setConfirmationMotDePasse(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                onChange={(v) => {
+                  setConfirmationMotDePasse(v);
+                  effacerErreurMdp("confirmation");
+                }}
               />
+              {erreursMdp.confirmation && (
+                <p className="mt-1 text-sm text-red-600">{erreursMdp.confirmation}</p>
+              )}
             </div>
           </div>
 
@@ -277,7 +392,6 @@ function ProfilPage() {
           {passwordSuccess && (
             <p className="mt-4 text-sm text-emerald-600">{passwordSuccess}</p>
           )}
-
           <div className="mt-6 flex justify-end">
             <button
               type="submit"

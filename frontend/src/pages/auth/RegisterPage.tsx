@@ -40,7 +40,7 @@ const effacerErreur = (champ: string) =>
 
 if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
 if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
-if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@gmail.com)";
+if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
 if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
 if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
 if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";

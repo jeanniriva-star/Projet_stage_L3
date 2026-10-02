@@ -11,10 +11,15 @@ import {
   checkUserDeletion,
   deleteUser,
 } from "./user.controller.js";
+import {
+  updateProfilSchema,
+  createUserAdminSchema,
+  changerMotDePasseSchema,
+} from "../../validators/user.schema.js";
 
 import { authenticate } from "../../middlewares/auth.middleware.js";
 import { authorize } from "../../middlewares/role.middleware.js";
-
+import { validate } from "../../middlewares/validate.middleware.js";
 const router = Router();
 
 // PROFIL UTILISATEUR CONNECTÉ
@@ -27,12 +32,14 @@ router.get(
 router.patch(
   "/me",
   authenticate,
+  validate(updateProfilSchema),
   updateMonProfil
 );
 
 router.patch(
   "/me/password",
   authenticate,
+  validate(changerMotDePasseSchema),
   changerMotDePasse
 );
 
@@ -41,6 +48,7 @@ router.post(
   "/",
   authenticate,
   authorize("ADMIN"),
+  validate(createUserAdminSchema),
   createUserByAdmin
 );
 router.get(
