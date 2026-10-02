@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { validate } from "../../middlewares/validate.middleware.js";
+import { registerSchema } from "../../validators/user.schema.js";
 import {
   login,
   register,
@@ -9,7 +11,7 @@ import { authenticate } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.post("/register", register);
+router.post("/register", validate(registerSchema), register);
 router.post("/login", login);
 
 router.get("/me", authenticate, me);
