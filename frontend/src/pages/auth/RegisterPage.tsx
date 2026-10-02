@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { onlyLetters, onlyPhone,isValidName, isValidEmail,isValidPassword,isValidPhone,} from "../../utils/validation";
 
 import { register } from "../../services/auth.service";
 
@@ -18,9 +19,28 @@ function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [erreurs, setErreurs] = useState<Record<string, string>>({});
+
+const effacerErreur = (champ: string) =>
+  setErreurs((prev) => ({ ...prev, [champ]: "" }));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const nouvellesErreurs: Record<string, string> = {};
+
+if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
+if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
+if (!isValidEmail(email)) nouvellesErreurs.email = "Format invalide (exemple : nom@gmail.com)";
+if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
+if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
+if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
+
+if (Object.keys(nouvellesErreurs).length > 0) {
+  setErreurs(nouvellesErreurs);
+  return;
+}
+
+setErreurs({});
 
     try {
       setLoading(true);
@@ -65,74 +85,107 @@ function RegisterPage() {
           </p>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5"
-        >
-          <div className="grid gap-5 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
             <input
               type="text"
               placeholder="Nom"
               value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              className="rounded-xl border border-slate-300 px-4 py-3"
+              onChange={(e) => {
+                setNom(onlyLetters(e.target.value));
+                effacerErreur("nom");
+              }}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3"
               required
             />
+            {erreurs.nom && <p className="mt-1 text-sm text-red-600">{erreurs.nom}</p>}
+          </div>
 
+          <div>
             <input
               type="text"
               placeholder="Prénom"
               value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
-              className="rounded-xl border border-slate-300 px-4 py-3"
+              onChange={(e) => {
+                setPrenom(onlyLetters(e.target.value));
+                effacerErreur("prenom");
+              }}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3"
               required
             />
+            {erreurs.prenom && <p className="mt-1 text-sm text-red-600">{erreurs.prenom}</p>}
           </div>
+        </div>
 
+        <div>
           <input
             type="email"
             placeholder="Adresse e-mail"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              effacerErreur("email");
+            }}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
             required
           />
+          {erreurs.email && <p className="mt-1 text-sm text-red-600">{erreurs.email}</p>}
+        </div>
 
+        <div>
           <input
             type="password"
-            placeholder="Mot de passe"
+            placeholder="Mot de passe (8 caractères minimum)"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              effacerErreur("password");
+            }}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
             required
           />
+          {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
+        </div>
 
+        <div>
           <input
             type="tel"
             placeholder="Téléphone"
             value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
+            onChange={(e) => {
+              setTelephone(onlyPhone(e.target.value));
+              effacerErreur("telephone");
+            }}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
             required
           />
+          {erreurs.telephone && <p className="mt-1 text-sm text-red-600">{erreurs.telephone}</p>}
+        </div>
 
+        <div>
           <input
             type="text"
             placeholder="Adresse"
             value={adresse}
-            onChange={(e) => setAdresse(e.target.value)}
+            onChange={(e) => {
+              setAdresse(e.target.value);
+              effacerErreur("adresse");
+            }}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
             required
           />
+          {erreurs.adresse && <p className="mt-1 text-sm text-red-600">{erreurs.adresse}</p>}
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
-          >
-            {loading ? "Création..." : "Créer mon compte"}
-          </button>
-        </form>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
+        >
+          {loading ? "Création..." : "Créer mon compte"}
+        </button>
+      </form>
 
         <p className="mt-6 text-center text-sm text-slate-600">
           Déjà un compte ?{" "}
