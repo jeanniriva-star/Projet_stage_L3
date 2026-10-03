@@ -63,3 +63,4 @@ export const changerMotDePasseSchema = z
     message: "Le nouveau mot de passe doit être différent de l'ancien",
     path: ["nouveauMotDePasse"],
   });
+  

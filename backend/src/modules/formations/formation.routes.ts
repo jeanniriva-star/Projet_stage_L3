@@ -6,6 +6,11 @@ import {
   updateFormation,
   deleteFormation,
 } from "./formation.controller.js";
+import { validate } from "../../middlewares/validate.middleware.js";
+import {
+  createFormationSchema,
+  updateFormationSchema,
+} from "../../validators/formation.schema.js";
 
 import { authenticate } from "../../middlewares/auth.middleware.js";
 import { authorize } from "../../middlewares/role.middleware.js";
@@ -16,6 +21,7 @@ router.post(
   "/",
   authenticate,
   authorize("ADMIN"),
+  validate(createFormationSchema),
   createFormation
 );
 
@@ -33,6 +39,7 @@ router.patch(
   "/:id",
   authenticate,
   authorize("ADMIN"),
+  validate(updateFormationSchema),
   updateFormation
 );
 

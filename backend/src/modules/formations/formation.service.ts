@@ -3,6 +3,7 @@ import prisma from "../../config/prisma.js";
 interface CreateFormationData {
   titre: string;
   description?: string;
+  prix: number;
   createurId: string;
 }
 
@@ -11,12 +12,14 @@ export async function createFormation(data: CreateFormationData) {
     data: {
       titre: data.titre,
       description: data.description,
+      prix: data.prix,
       createurId: data.createurId,
     },
     select: {
       id: true,
       titre: true,
       description: true,
+      prix: true,
       createdAt: true,
       updatedAt: true,
       createur: {
@@ -37,6 +40,7 @@ export async function getFormations() {
       id: true,
       titre: true,
       description: true,
+      prix: true,
       createdAt: true,
       updatedAt: true,
       createur: {
@@ -57,6 +61,7 @@ export async function getFormations() {
 interface UpdateFormationData {
   titre?: string;
   description?: string | null;
+  prix?: number;
 }
 
 // Détail d'une formation
@@ -70,6 +75,7 @@ export async function getFormationById(id: string) {
       id: true,
       titre: true,
       description: true,
+      prix: true,
       createdAt: true,
       updatedAt: true,
 
@@ -128,12 +134,16 @@ export async function updateFormation(
       ...(data.description !== undefined && {
         description: data.description,
       }),
+      ...(data.prix !== undefined && {
+        prix: data.prix,
+      }),
     },
 
     select: {
       id: true,
       titre: true,
       description: true,
+      prix: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -241,6 +251,7 @@ export async function getFormationsPagines(
         id: true,
         titre: true,
         description: true,
+        prix: true,
         createdAt: true,
         updatedAt: true,
 
@@ -285,3 +296,4 @@ export async function getFormationsPagines(
     },
   };
 }
+

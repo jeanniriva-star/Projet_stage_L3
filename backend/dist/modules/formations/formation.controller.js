@@ -6,7 +6,7 @@ export async function createFormation(req, res) {
                 message: "Non authentifié",
             });
         }
-        const { titre, description } = req.body;
+        const { titre, description, prix } = req.body;
         if (!titre) {
             return res.status(400).json({
                 message: "Le titre est obligatoire",
@@ -15,6 +15,7 @@ export async function createFormation(req, res) {
         const formation = await formationService.createFormation({
             titre,
             description,
+            prix,
             createurId: req.user.id,
         });
         return res.status(201).json({
@@ -106,14 +107,15 @@ export async function getFormationById(req, res) {
 export async function updateFormation(req, res) {
     try {
         const id = req.params.id;
-        const { titre, description } = req.body;
+        const { titre, description, prix } = req.body;
         if (typeof id !== "string") {
             return res.status(400).json({
                 message: "Identifiant de formation invalide",
             });
         }
         if (titre === undefined &&
-            description === undefined) {
+            description === undefined &&
+            prix === undefined) {
             return res.status(400).json({
                 message: "Aucune modification n'a été fournie",
             });
@@ -138,6 +140,9 @@ export async function updateFormation(req, res) {
             }),
             ...(description !== undefined && {
                 description,
+            }),
+            ...(prix !== undefined && {
+                prix,
             }),
         });
         return res.status(200).json({

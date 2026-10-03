@@ -9,7 +9,7 @@ export async function createFormation(req: Request, res: Response) {
       });
     }
 
-    const { titre, description } = req.body;
+    const { titre, description, prix } = req.body;
 
     if (!titre) {
       return res.status(400).json({
@@ -20,6 +20,7 @@ export async function createFormation(req: Request, res: Response) {
     const formation = await formationService.createFormation({
       titre,
       description,
+      prix,
       createurId: req.user.id,
     });
 
@@ -149,7 +150,7 @@ export async function updateFormation(
 ) {
   try {
     const id = req.params.id;
-    const { titre, description } = req.body;
+    const { titre, description, prix } = req.body;
 
     if (typeof id !== "string") {
       return res.status(400).json({
@@ -157,10 +158,11 @@ export async function updateFormation(
       });
     }
 
-    if (
-      titre === undefined &&
-      description === undefined
-    ) {
+   if (
+    titre === undefined &&
+    description === undefined &&
+    prix === undefined
+  ) {
       return res.status(400).json({
         message:
           "Aucune modification n'a été fournie",
@@ -197,6 +199,9 @@ export async function updateFormation(
 
           ...(description !== undefined && {
             description,
+          }),
+          ...(prix !== undefined && {
+            prix,
           }),
         }
       );

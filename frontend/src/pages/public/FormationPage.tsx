@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
+import { formatPrix } from "../../utils/format";
 
 import {
   getFormations,
@@ -103,7 +104,7 @@ function FormationsPage() {
                   </p>
 
                   <p className="mt-1 font-bold text-slate-900">
-                    À définir
+                    {formatPrix(formation.prix)}
                   </p>
                 </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
+import { formatPrix } from "../../utils/format";
 
 import {
   getFormationById,
@@ -93,8 +94,8 @@ function FormationDetailPage() {
             Prix
           </p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-900">
-            À définir
+         <p className="mt-1 text-2xl font-bold text-slate-900">
+            {formatPrix(formation.prix)}
           </p>
 
           <Link

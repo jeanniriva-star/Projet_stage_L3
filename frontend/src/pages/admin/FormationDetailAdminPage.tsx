@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { formatPrix } from "../../utils/format";
 
 import {
   Link,
@@ -193,7 +194,16 @@ function FormationDetailAdminPage() {
 
         {/* STATISTIQUES */}
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-sm text-slate-500">
+                Prix
+              </p>
+
+              <p className="mt-2 text-2xl font-bold text-slate-900">
+                {formatPrix(formation.prix)}
+              </p>
+            </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">
               Cours

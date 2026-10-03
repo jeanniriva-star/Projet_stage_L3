@@ -64,6 +64,7 @@ model Formation {
   id          String  @id @default(uuid())
   titre       String
   description String?
+  prix Decimal @default(0) @db.Decimal(10, 2)
 
   createurId String
   createur   User   @relation("CreateurFormation", fields: [createurId], references: [id])

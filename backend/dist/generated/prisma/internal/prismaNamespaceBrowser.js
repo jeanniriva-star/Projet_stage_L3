@@ -80,6 +80,7 @@ export const FormationScalarFieldEnum = {
     id: 'id',
     titre: 'titre',
     description: 'description',
+    prix: 'prix',
     createurId: 'createurId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'

@@ -20,14 +20,25 @@ export type FormationModel = runtime.Types.Result.DefaultSelection<Prisma.$Forma
 
 export type AggregateFormation = {
   _count: FormationCountAggregateOutputType | null
+  _avg: FormationAvgAggregateOutputType | null
+  _sum: FormationSumAggregateOutputType | null
   _min: FormationMinAggregateOutputType | null
   _max: FormationMaxAggregateOutputType | null
+}
+
+export type FormationAvgAggregateOutputType = {
+  prix: runtime.Decimal | null
+}
+
+export type FormationSumAggregateOutputType = {
+  prix: runtime.Decimal | null
 }
 
 export type FormationMinAggregateOutputType = {
   id: string | null
   titre: string | null
   description: string | null
+  prix: runtime.Decimal | null
   createurId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -37,6 +48,7 @@ export type FormationMaxAggregateOutputType = {
   id: string | null
   titre: string | null
   description: string | null
+  prix: runtime.Decimal | null
   createurId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,6 +58,7 @@ export type FormationCountAggregateOutputType = {
   id: number
   titre: number
   description: number
+  prix: number
   createurId: number
   createdAt: number
   updatedAt: number
@@ -53,10 +66,19 @@ export type FormationCountAggregateOutputType = {
 }
 
 
+export type FormationAvgAggregateInputType = {
+  prix?: true
+}
+
+export type FormationSumAggregateInputType = {
+  prix?: true
+}
+
 export type FormationMinAggregateInputType = {
   id?: true
   titre?: true
   description?: true
+  prix?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -66,6 +88,7 @@ export type FormationMaxAggregateInputType = {
   id?: true
   titre?: true
   description?: true
+  prix?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -75,6 +98,7 @@ export type FormationCountAggregateInputType = {
   id?: true
   titre?: true
   description?: true
+  prix?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -119,6 +143,18 @@ export type FormationAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: FormationAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: FormationSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: FormationMinAggregateInputType
@@ -149,6 +185,8 @@ export type FormationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: FormationCountAggregateInputType | true
+  _avg?: FormationAvgAggregateInputType
+  _sum?: FormationSumAggregateInputType
   _min?: FormationMinAggregateInputType
   _max?: FormationMaxAggregateInputType
 }
@@ -157,10 +195,13 @@ export type FormationGroupByOutputType = {
   id: string
   titre: string
   description: string | null
+  prix: runtime.Decimal
   createurId: string
   createdAt: Date
   updatedAt: Date
   _count: FormationCountAggregateOutputType | null
+  _avg: FormationAvgAggregateOutputType | null
+  _sum: FormationSumAggregateOutputType | null
   _min: FormationMinAggregateOutputType | null
   _max: FormationMaxAggregateOutputType | null
 }
@@ -187,6 +228,7 @@ export type FormationWhereInput = {
   id?: Prisma.StringFilter<"Formation"> | string
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
+  prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -201,6 +243,7 @@ export type FormationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  prix?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -218,6 +261,7 @@ export type FormationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FormationWhereInput | Prisma.FormationWhereInput[]
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
+  prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -232,12 +276,15 @@ export type FormationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  prix?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormationCountOrderByAggregateInput
+  _avg?: Prisma.FormationAvgOrderByAggregateInput
   _max?: Prisma.FormationMaxOrderByAggregateInput
   _min?: Prisma.FormationMinOrderByAggregateInput
+  _sum?: Prisma.FormationSumOrderByAggregateInput
 }
 
 export type FormationScalarWhereWithAggregatesInput = {
@@ -247,6 +294,7 @@ export type FormationScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Formation"> | string
   titre?: Prisma.StringWithAggregatesFilter<"Formation"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Formation"> | string | null
+  prix?: Prisma.DecimalWithAggregatesFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringWithAggregatesFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Formation"> | Date | string
@@ -256,6 +304,7 @@ export type FormationCreateInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -269,6 +318,7 @@ export type FormationUncheckedCreateInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -282,6 +332,7 @@ export type FormationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -295,6 +346,7 @@ export type FormationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -308,6 +360,7 @@ export type FormationCreateManyInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -317,6 +370,7 @@ export type FormationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -325,6 +379,7 @@ export type FormationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,15 +399,21 @@ export type FormationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  prix?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type FormationAvgOrderByAggregateInput = {
+  prix?: Prisma.SortOrder
 }
 
 export type FormationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  prix?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -362,9 +423,14 @@ export type FormationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  prix?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type FormationSumOrderByAggregateInput = {
+  prix?: Prisma.SortOrder
 }
 
 export type FormationScalarRelationFilter = {
@@ -416,6 +482,14 @@ export type FormationUncheckedUpdateManyWithoutCreateurNestedInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type FormationCreateNestedOneWithoutAffectationsInput = {
@@ -478,6 +552,7 @@ export type FormationCreateWithoutCreateurInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationFormateurCreateNestedManyWithoutFormationInput
@@ -490,6 +565,7 @@ export type FormationUncheckedCreateWithoutCreateurInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationFormateurUncheckedCreateNestedManyWithoutFormationInput
@@ -531,6 +607,7 @@ export type FormationScalarWhereInput = {
   id?: Prisma.StringFilter<"Formation"> | string
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
+  prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -540,6 +617,7 @@ export type FormationCreateWithoutAffectationsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -552,6 +630,7 @@ export type FormationUncheckedCreateWithoutAffectationsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -580,6 +659,7 @@ export type FormationUpdateWithoutAffectationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -592,6 +672,7 @@ export type FormationUncheckedUpdateWithoutAffectationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -604,6 +685,7 @@ export type FormationCreateWithoutCoursInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -616,6 +698,7 @@ export type FormationUncheckedCreateWithoutCoursInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -644,6 +727,7 @@ export type FormationUpdateWithoutCoursInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -656,6 +740,7 @@ export type FormationUncheckedUpdateWithoutCoursInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -668,6 +753,7 @@ export type FormationCreateWithoutSessionsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -680,6 +766,7 @@ export type FormationUncheckedCreateWithoutSessionsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -708,6 +795,7 @@ export type FormationUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -720,6 +808,7 @@ export type FormationUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,6 +821,7 @@ export type FormationCreateWithoutInscriptionsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -744,6 +834,7 @@ export type FormationUncheckedCreateWithoutInscriptionsInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -772,6 +863,7 @@ export type FormationUpdateWithoutInscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -784,6 +876,7 @@ export type FormationUncheckedUpdateWithoutInscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -796,6 +889,7 @@ export type FormationCreateManyCreateurInput = {
   id?: string
   titre: string
   description?: string | null
+  prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -804,6 +898,7 @@ export type FormationUpdateWithoutCreateurInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationFormateurUpdateManyWithoutFormationNestedInput
@@ -816,6 +911,7 @@ export type FormationUncheckedUpdateWithoutCreateurInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationFormateurUncheckedUpdateManyWithoutFormationNestedInput
@@ -828,6 +924,7 @@ export type FormationUncheckedUpdateManyWithoutCreateurInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -894,6 +991,7 @@ export type FormationSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   titre?: boolean
   description?: boolean
+  prix?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -909,6 +1007,7 @@ export type FormationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   titre?: boolean
   description?: boolean
+  prix?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -919,6 +1018,7 @@ export type FormationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   titre?: boolean
   description?: boolean
+  prix?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -929,12 +1029,13 @@ export type FormationSelectScalar = {
   id?: boolean
   titre?: boolean
   description?: boolean
+  prix?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titre" | "description" | "createurId" | "createdAt" | "updatedAt", ExtArgs["result"]["formation"]>
+export type FormationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titre" | "description" | "prix" | "createurId" | "createdAt" | "updatedAt", ExtArgs["result"]["formation"]>
 export type FormationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createur?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   affectations?: boolean | Prisma.Formation$affectationsArgs<ExtArgs>
@@ -963,6 +1064,7 @@ export type $FormationPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: string
     titre: string
     description: string | null
+    prix: runtime.Decimal
     createurId: string
     createdAt: Date
     updatedAt: Date
@@ -1397,6 +1499,7 @@ export interface FormationFieldRefs {
   readonly id: Prisma.FieldRef<"Formation", 'String'>
   readonly titre: Prisma.FieldRef<"Formation", 'String'>
   readonly description: Prisma.FieldRef<"Formation", 'String'>
+  readonly prix: Prisma.FieldRef<"Formation", 'Decimal'>
   readonly createurId: Prisma.FieldRef<"Formation", 'String'>
   readonly createdAt: Prisma.FieldRef<"Formation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Formation", 'DateTime'>

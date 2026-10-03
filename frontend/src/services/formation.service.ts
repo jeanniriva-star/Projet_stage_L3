@@ -4,6 +4,7 @@ export interface Formation {
   id: string;
   titre: string;
   description: string | null;
+  prix: string, 
   createdAt: string;
   updatedAt: string;
 
@@ -67,6 +68,7 @@ export interface FormationAdmin {
   id: string;
   titre: string;
   description: string | null;
+  prix: string,
   createdAt: string;
   updatedAt: string;
 
@@ -125,6 +127,7 @@ export async function createFormationAdmin(
   data: {
     titre: string;
     description?: string;
+    prix: number;
   }
 ) {
   const response =
@@ -141,6 +144,7 @@ export async function updateFormationAdmin(
   data: {
     titre?: string;
     description?: string | null;
+    prix?: number;
   }
 ) {
   const response =
@@ -169,6 +173,7 @@ export interface FormationDetailAdmin {
   id: string;
   titre: string;
   description: string | null;
+  prix: string,
   createdAt: string;
   updatedAt: string;
 

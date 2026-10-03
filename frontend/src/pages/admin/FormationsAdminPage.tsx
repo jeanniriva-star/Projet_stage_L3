@@ -6,7 +6,8 @@ import {
 import { Link } from "react-router-dom";
 
 import axios from "axios";
-
+import { onlyPrix, isValidPrix } from "../../utils/validation";
+import { formatPrix } from "../../utils/format";
 import {
   createFormationAdmin,
   deleteFormationAdmin,
@@ -70,6 +71,10 @@ function FormationsAdminPage() {
     setDescription,
   ] = useState("");
 
+  const [prix, setPrix] = useState("");
+
+  const [erreurs, setErreurs] = useState<Record<string, string>>({});
+
   const [
     creating,
     setCreating,
@@ -93,6 +98,10 @@ function FormationsAdminPage() {
     editDescription,
     setEditDescription,
   ] = useState("");
+
+  const [editPrix, setEditPrix] = useState("");
+
+  const [erreursEdit, setErreursEdit] = useState<Record<string, string>>({});
 
   const [
     updating,
@@ -255,60 +264,48 @@ function FormationsAdminPage() {
   // CRÉATION
   // =====================================================
 
-  async function handleCreate(
-    event: FormEvent<HTMLFormElement>
-  ) {
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!titre.trim()) {
-      window.alert(
-        "Le titre est obligatoire."
-      );
+    const nouvellesErreurs: Record<string, string> = {};
 
+    if (titre.trim().length < 3) nouvellesErreurs.titre = "Au moins 3 caractères";
+    if (!isValidPrix(prix))
+      nouvellesErreurs.prix = "Prix obligatoire, supérieur à 0 (exemple : 50000)";
+
+    if (Object.keys(nouvellesErreurs).length > 0) {
+      setErreurs(nouvellesErreurs);
       return;
     }
+
+    setErreurs({});
 
     try {
       setCreating(true);
 
       await createFormationAdmin({
         titre: titre.trim(),
-
-        ...(description.trim() && {
-          description:
-            description.trim(),
-        }),
+        ...(description.trim() && { description: description.trim() }),
+        prix: Number(prix),
       });
 
       setTitre("");
       setDescription("");
+      setPrix("");
       setShowCreateForm(false);
 
-      await chargerFormations(
-        1,
-        recherche
-      );
+      await chargerFormations(1, recherche);
 
-      window.alert(
-        "Formation créée avec succès."
-      );
+      window.alert("Formation créée avec succès.");
     } catch (err: unknown) {
-      console.error(
-        "Erreur création formation :",
-        err
-      );
+      console.error("Erreur création formation :", err);
 
-      if (
-        axios.isAxiosError(err)
-      ) {
+      if (axios.isAxiosError(err)) {
         window.alert(
-          err.response?.data?.message ??
-            "Impossible de créer la formation."
+          err.response?.data?.message ?? "Impossible de créer la formation."
         );
       } else {
-        window.alert(
-          "Impossible de créer la formation."
-        );
+        window.alert("Impossible de créer la formation.");
       }
     } finally {
       setCreating(false);
@@ -333,6 +330,15 @@ function FormationsAdminPage() {
     setEditDescription(
       formation.description ?? ""
     );
+
+    // Les anciennes formations ont 0 : on laisse vide pour forcer un vrai prix
+    setEditPrix(
+      Number(formation.prix) > 0
+        ? String(Number(formation.prix))
+        : ""
+    );
+
+    setErreursEdit({});
   }
 
   // =====================================================
@@ -350,13 +356,18 @@ function FormationsAdminPage() {
       return;
     }
 
-    if (!editTitre.trim()) {
-      window.alert(
-        "Le titre est obligatoire."
-      );
+    const nouvellesErreurs: Record<string, string> = {};
 
+    if (editTitre.trim().length < 3) nouvellesErreurs.titre = "Au moins 3 caractères";
+    if (!isValidPrix(editPrix))
+      nouvellesErreurs.prix = "Prix obligatoire, supérieur à 0 (exemple : 50000)";
+
+    if (Object.keys(nouvellesErreurs).length > 0) {
+      setErreursEdit(nouvellesErreurs);
       return;
     }
+
+    setErreursEdit({});
 
     try {
       setUpdating(true);
@@ -371,6 +382,8 @@ function FormationsAdminPage() {
             editDescription.trim()
               ? editDescription.trim()
               : null,
+
+          prix: Number(editPrix),
         }
       );
 
@@ -534,9 +547,8 @@ function FormationsAdminPage() {
             </h2>
 
             <form
-              onSubmit={
-                handleCreate
-              }
+              onSubmit={handleCreate}
+              noValidate
               className="mt-6 space-y-5"
             >
               <div>
@@ -547,13 +559,38 @@ function FormationsAdminPage() {
                 <input
                   type="text"
                   value={titre}
-                  onChange={(event) =>
-                    setTitre(
-                      event.target.value
-                    )
-                  }
+                  onChange={(event) => {
+                    setTitre(event.target.value);
+                    setErreurs((prev) => ({ ...prev, titre: "" }));
+                  }}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
                 />
+
+                {erreurs.titre && (
+                  <p className="mt-1 text-sm text-red-600">{erreurs.titre}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Prix
+                </label>
+
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="Exemple : 50000"
+                  value={prix}
+                  onChange={(event) => {
+                    setPrix(onlyPrix(event.target.value));
+                    setErreurs((prev) => ({ ...prev, prix: "" }));
+                  }}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                />
+
+                {erreurs.prix && (
+                  <p className="mt-1 text-sm text-red-600">{erreurs.prix}</p>
+                )}
               </div>
 
               <div>
@@ -585,6 +622,8 @@ function FormationsAdminPage() {
 
                     setTitre("");
                     setDescription("");
+                    setPrix("");
+                    setErreurs({});
                   }}
                   className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700"
                 >
@@ -685,6 +724,10 @@ function FormationsAdminPage() {
                     </th>
 
                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase text-white">
+                      Prix
+                    </th>
+
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase text-white">
                       Créateur
                     </th>
 
@@ -734,6 +777,10 @@ function FormationsAdminPage() {
                               }
                             </p>
                           )}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 py-4 text-sm font-semibold text-slate-900">
+                          {formatPrix(formation.prix)}
                         </td>
 
                         <td className="px-5 py-4 text-sm text-slate-600">
@@ -873,9 +920,8 @@ function FormationsAdminPage() {
               </h2>
 
               <form
-                onSubmit={
-                  handleUpdate
-                }
+                onSubmit={handleUpdate}
+                noValidate
                 className="mt-6 space-y-5"
               >
                 <div>
@@ -888,13 +934,38 @@ function FormationsAdminPage() {
                     value={
                       editTitre
                     }
-                    onChange={(event) =>
-                      setEditTitre(
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => {
+                      setEditTitre(event.target.value);
+                      setErreursEdit((prev) => ({ ...prev, titre: "" }));
+                    }}
                     className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
                   />
+
+                  {erreursEdit.titre && (
+                    <p className="mt-1 text-sm text-red-600">{erreursEdit.titre}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Prix
+                  </label>
+
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="Exemple : 50000"
+                    value={editPrix}
+                    onChange={(event) => {
+                      setEditPrix(onlyPrix(event.target.value));
+                      setErreursEdit((prev) => ({ ...prev, prix: "" }));
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+
+                  {erreursEdit.prix && (
+                    <p className="mt-1 text-sm text-red-600">{erreursEdit.prix}</p>
+                  )}
                 </div>
 
                 <div>

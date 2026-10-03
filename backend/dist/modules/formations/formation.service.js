@@ -4,12 +4,14 @@ export async function createFormation(data) {
         data: {
             titre: data.titre,
             description: data.description,
+            prix: data.prix,
             createurId: data.createurId,
         },
         select: {
             id: true,
             titre: true,
             description: true,
+            prix: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -29,6 +31,7 @@ export async function getFormations() {
             id: true,
             titre: true,
             description: true,
+            prix: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -55,6 +58,7 @@ export async function getFormationById(id) {
             id: true,
             titre: true,
             description: true,
+            prix: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -101,11 +105,15 @@ export async function updateFormation(id, data) {
             ...(data.description !== undefined && {
                 description: data.description,
             }),
+            ...(data.prix !== undefined && {
+                prix: data.prix,
+            }),
         },
         select: {
             id: true,
             titre: true,
             description: true,
+            prix: true,
             createdAt: true,
             updatedAt: true,
         },
@@ -181,6 +189,7 @@ export async function getFormationsPagines(params) {
                 id: true,
                 titre: true,
                 description: true,
+                prix: true,
                 createdAt: true,
                 updatedAt: true,
                 createur: {
