@@ -42,3 +42,22 @@ export const StatutSession = {
 } as const
 
 export type StatutSession = (typeof StatutSession)[keyof typeof StatutSession]
+
+
+export const TypeFormation = {
+  CONTINUE: 'CONTINUE',
+  PROFESSIONNELLE: 'PROFESSIONNELLE'
+} as const
+
+export type TypeFormation = (typeof TypeFormation)[keyof typeof TypeFormation]
+
+
+export const NiveauUniversitaire = {
+  L1: 'L1',
+  L2: 'L2',
+  L3: 'L3',
+  M1: 'M1',
+  M2: 'M2'
+} as const
+
+export type NiveauUniversitaire = (typeof NiveauUniversitaire)[keyof typeof NiveauUniversitaire]

@@ -1,14 +1,13 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 function ApprenantLayout() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+ // const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
-    navigate("/login");
-  }
+function handleLogout() {
+  logout("/");
+}
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${

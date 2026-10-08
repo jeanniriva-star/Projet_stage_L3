@@ -26,4 +26,15 @@ export const StatutSession = {
     EN_COURS: 'EN_COURS',
     TERMINEE: 'TERMINEE'
 };
+export const TypeFormation = {
+    CONTINUE: 'CONTINUE',
+    PROFESSIONNELLE: 'PROFESSIONNELLE'
+};
+export const NiveauUniversitaire = {
+    L1: 'L1',
+    L2: 'L2',
+    L3: 'L3',
+    M1: 'M1',
+    M2: 'M2'
+};
 //# sourceMappingURL=enums.js.map

@@ -25,12 +25,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updatedUser);
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("utilisateur");
-    setToken(null);
-    setUser(null);
+  function logout(redirectTo?: string) {
+  localStorage.removeItem("token");
+  localStorage.removeItem("utilisateur");
+
+  // Avec une destination : on recharge sans toucher à l'état React,
+  // pour que ProtectedRoute n'ait pas le temps de rediriger vers /login
+  if (redirectTo) {
+    window.location.replace(redirectTo);
+    return;
   }
+
+  setToken(null);
+  setUser(null);
+}
 
   return (
     <AuthContext.Provider

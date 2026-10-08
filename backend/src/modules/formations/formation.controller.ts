@@ -9,7 +9,7 @@ export async function createFormation(req: Request, res: Response) {
       });
     }
 
-    const { titre, description, prix } = req.body;
+   const { titre, description, prix, type, niveau } = req.body;
 
     if (!titre) {
       return res.status(400).json({
@@ -17,12 +17,14 @@ export async function createFormation(req: Request, res: Response) {
       });
     }
 
-    const formation = await formationService.createFormation({
-      titre,
-      description,
-      prix,
-      createurId: req.user.id,
-    });
+   const formation = await formationService.createFormation({
+  titre,
+  description,
+  prix,
+  type,
+  niveau,
+  createurId: req.user.id,
+});
 
     return res.status(201).json({
       message: "Formation créée avec succès",
@@ -150,7 +152,7 @@ export async function updateFormation(
 ) {
   try {
     const id = req.params.id;
-    const { titre, description, prix } = req.body;
+  const { titre, description, prix, type, niveau } = req.body;
 
     if (typeof id !== "string") {
       return res.status(400).json({
@@ -158,11 +160,13 @@ export async function updateFormation(
       });
     }
 
-   if (
-    titre === undefined &&
-    description === undefined &&
-    prix === undefined
-  ) {
+if (
+  titre === undefined &&
+  description === undefined &&
+  prix === undefined &&
+  type === undefined &&
+  niveau === undefined
+) {
       return res.status(400).json({
         message:
           "Aucune modification n'a été fournie",
@@ -202,6 +206,13 @@ export async function updateFormation(
           }),
           ...(prix !== undefined && {
             prix,
+          }),
+          ...(type !== undefined && {
+            type,
+          }),
+
+          ...(niveau !== undefined && {
+            niveau,
           }),
         }
       );

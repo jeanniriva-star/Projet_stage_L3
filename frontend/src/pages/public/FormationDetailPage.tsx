@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
-import { formatPrix } from "../../utils/format";
+import { formatPrix, formatType } from "../../utils/format";
 
 import {
   getFormationById,
@@ -53,9 +53,10 @@ function FormationDetailPage() {
     <div className="min-h-screen bg-slate-50">
       <section className="bg-slate-900 px-6 py-16 text-white">
         <div className="mx-auto max-w-5xl">
-       <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700">
-        <span className="text-base">◈</span>
-        Formation
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700">
+          <span className="text-base">◈</span>
+          Formation {formatType(formation.type).toLowerCase()}
+          {formation.niveau ? ` · ${formation.niveau}` : ""}
         </div>
 
           <h1 className="mt-5 text-4xl font-bold sm:text-5xl">

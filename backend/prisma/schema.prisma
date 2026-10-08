@@ -33,6 +33,18 @@ enum StatutSession {
   EN_COURS
   TERMINEE
 }
+enum TypeFormation {
+  CONTINUE
+  PROFESSIONNELLE
+}
+
+enum NiveauUniversitaire {
+  L1
+  L2
+  L3
+  M1
+  M2
+}
 // ======================================================
 // USER
 // ======================================================
@@ -65,6 +77,8 @@ model Formation {
   titre       String
   description String?
   prix Decimal @default(0) @db.Decimal(10, 2)
+  type   TypeFormation       @default(PROFESSIONNELLE)
+  niveau NiveauUniversitaire?
 
   createurId String
   createur   User   @relation("CreateurFormation", fields: [createurId], references: [id])

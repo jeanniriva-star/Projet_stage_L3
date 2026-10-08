@@ -1,5 +1,5 @@
 import { z } from "zod";
-export const createFormationSchema = z.object({
+const formationBase = z.object({
     titre: z
         .string()
         .trim()
@@ -9,6 +9,17 @@ export const createFormationSchema = z.object({
         .number("Le prix est obligatoire")
         .positive("Le prix doit être supérieur à 0")
         .max(99999999.99, "Prix trop élevé"),
+    type: z.enum(["CONTINUE", "PROFESSIONNELLE"], "Type de formation invalide"),
+    niveau: z.enum(["L1", "L2", "L3", "M1", "M2"], "Niveau invalide").nullish(),
 });
-export const updateFormationSchema = createFormationSchema.partial();
+// Le niveau est obligatoire pour une formation continue
+const regleNiveau = (data) => data.type !== "CONTINUE" || !!data.niveau;
+const messageNiveau = {
+    message: "Le niveau est obligatoire pour une formation continue",
+    path: ["niveau"],
+};
+export const createFormationSchema = formationBase.refine(regleNiveau, messageNiveau);
+export const updateFormationSchema = formationBase
+    .partial()
+    .refine(regleNiveau, messageNiveau);
 //# sourceMappingURL=formation.schema.js.map

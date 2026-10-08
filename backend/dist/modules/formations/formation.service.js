@@ -5,6 +5,8 @@ export async function createFormation(data) {
             titre: data.titre,
             description: data.description,
             prix: data.prix,
+            type: data.type,
+            niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
             createurId: data.createurId,
         },
         select: {
@@ -12,6 +14,8 @@ export async function createFormation(data) {
             titre: true,
             description: true,
             prix: true,
+            type: true,
+            niveau: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -32,6 +36,8 @@ export async function getFormations() {
             titre: true,
             description: true,
             prix: true,
+            type: true,
+            niveau: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -59,6 +65,8 @@ export async function getFormationById(id) {
             titre: true,
             description: true,
             prix: true,
+            type: true,
+            niveau: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -108,12 +116,18 @@ export async function updateFormation(id, data) {
             ...(data.prix !== undefined && {
                 prix: data.prix,
             }),
+            ...(data.type !== undefined && {
+                type: data.type,
+                niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
+            }),
         },
         select: {
             id: true,
             titre: true,
             description: true,
             prix: true,
+            type: true,
+            niveau: true,
             createdAt: true,
             updatedAt: true,
         },
@@ -190,6 +204,8 @@ export async function getFormationsPagines(params) {
                 titre: true,
                 description: true,
                 prix: true,
+                type: true,
+                niveau: true,
                 createdAt: true,
                 updatedAt: true,
                 createur: {

@@ -13,3 +13,8 @@ export function formatPrix(prix: string | number) {
     maximumFractionDigits: 2,
   }).format(valeur)} ${DEVISE}`;
 }
+export const NIVEAUX = ["L1", "L2", "L3", "M1", "M2"] as const;
+
+export function formatType(type: string) {
+  return type === "CONTINUE" ? "Continue" : "Professionnelle";
+}

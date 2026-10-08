@@ -13,6 +13,8 @@ export async function createFormation(data: CreateFormationData) {
       titre: data.titre,
       description: data.description,
       prix: data.prix,
+      type: data.type,
+      niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
       createurId: data.createurId,
     },
     select: {
@@ -20,6 +22,8 @@ export async function createFormation(data: CreateFormationData) {
       titre: true,
       description: true,
       prix: true,
+      type: true,
+      niveau: true,
       createdAt: true,
       updatedAt: true,
       createur: {
@@ -41,6 +45,8 @@ export async function getFormations() {
       titre: true,
       description: true,
       prix: true,
+      type: true,
+      niveau: true,
       createdAt: true,
       updatedAt: true,
       createur: {
@@ -76,6 +82,8 @@ export async function getFormationById(id: string) {
       titre: true,
       description: true,
       prix: true,
+      type: true,
+      niveau: true,
       createdAt: true,
       updatedAt: true,
 
@@ -137,6 +145,10 @@ export async function updateFormation(
       ...(data.prix !== undefined && {
         prix: data.prix,
       }),
+      ...(data.type !== undefined && {
+      type: data.type,
+      niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
+}),
     },
 
     select: {
@@ -144,6 +156,8 @@ export async function updateFormation(
       titre: true,
       description: true,
       prix: true,
+      type: true,
+      niveau: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -252,6 +266,8 @@ export async function getFormationsPagines(
         titre: true,
         description: true,
         prix: true,
+        type: true,
+        niveau: true,
         createdAt: true,
         updatedAt: true,
 
@@ -297,3 +313,19 @@ export async function getFormationsPagines(
   };
 }
 
+interface CreateFormationData {
+  titre: string;
+  description?: string;
+  prix: number;
+  type: "CONTINUE" | "PROFESSIONNELLE";
+  niveau?: "L1" | "L2" | "L3" | "M1" | "M2" | null;
+  createurId: string;
+}
+
+interface UpdateFormationData {
+  titre?: string;
+  description?: string | null;
+  prix?: number;
+  type?: "CONTINUE" | "PROFESSIONNELLE";
+  niveau?: "L1" | "L2" | "L3" | "M1" | "M2" | null;
+}

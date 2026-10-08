@@ -1,10 +1,14 @@
 import api from "../api/axios";
+export type TypeFormation = "CONTINUE" | "PROFESSIONNELLE";
+export type NiveauUniversitaire = "L1" | "L2" | "L3" | "M1" | "M2";
 
 export interface Formation {
   id: string;
   titre: string;
   description: string | null;
   prix: string, 
+  type: TypeFormation;
+  niveau: NiveauUniversitaire | null;
   createdAt: string;
   updatedAt: string;
 
@@ -69,6 +73,8 @@ export interface FormationAdmin {
   titre: string;
   description: string | null;
   prix: string,
+  type: TypeFormation;
+  niveau: NiveauUniversitaire | null;
   createdAt: string;
   updatedAt: string;
 
@@ -128,6 +134,8 @@ export async function createFormationAdmin(
     titre: string;
     description?: string;
     prix: number;
+    type: TypeFormation;
+    niveau?: NiveauUniversitaire | null;
   }
 ) {
   const response =
@@ -145,6 +153,8 @@ export async function updateFormationAdmin(
     titre?: string;
     description?: string | null;
     prix?: number;
+    type?: TypeFormation;
+    niveau?: NiveauUniversitaire | null;
   }
 ) {
   const response =
@@ -174,6 +184,8 @@ export interface FormationDetailAdmin {
   titre: string;
   description: string | null;
   prix: string,
+  type: TypeFormation;
+  niveau: NiveauUniversitaire | null;
   createdAt: string;
   updatedAt: string;
 

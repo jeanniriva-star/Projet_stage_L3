@@ -7,13 +7,15 @@ import { Link } from "react-router-dom";
 
 import axios from "axios";
 import { onlyPrix, isValidPrix } from "../../utils/validation";
-import { formatPrix } from "../../utils/format";
+import { formatPrix, formatType, NIVEAUX } from "../../utils/format";
 import {
   createFormationAdmin,
   deleteFormationAdmin,
   getFormationsAdmin,
   updateFormationAdmin,
   type FormationAdmin,
+  type NiveauUniversitaire,
+  type TypeFormation,
 } from "../../services/formation.service";
 
 function FormationsAdminPage() {
@@ -73,6 +75,11 @@ function FormationsAdminPage() {
 
   const [prix, setPrix] = useState("");
 
+  const [typeFormation, setTypeFormation] =
+    useState<TypeFormation>("PROFESSIONNELLE");
+
+  const [niveau, setNiveau] = useState("");
+
   const [erreurs, setErreurs] = useState<Record<string, string>>({});
 
   const [
@@ -100,6 +107,11 @@ function FormationsAdminPage() {
   ] = useState("");
 
   const [editPrix, setEditPrix] = useState("");
+
+  const [editType, setEditType] =
+    useState<TypeFormation>("PROFESSIONNELLE");
+
+  const [editNiveau, setEditNiveau] = useState("");
 
   const [erreursEdit, setErreursEdit] = useState<Record<string, string>>({});
 
@@ -272,6 +284,8 @@ function FormationsAdminPage() {
     if (titre.trim().length < 3) nouvellesErreurs.titre = "Au moins 3 caractères";
     if (!isValidPrix(prix))
       nouvellesErreurs.prix = "Prix obligatoire, supérieur à 0 (exemple : 50000)";
+    if (typeFormation === "CONTINUE" && !niveau)
+      nouvellesErreurs.niveau = "Le niveau est obligatoire pour une formation continue";
 
     if (Object.keys(nouvellesErreurs).length > 0) {
       setErreurs(nouvellesErreurs);
@@ -287,11 +301,17 @@ function FormationsAdminPage() {
         titre: titre.trim(),
         ...(description.trim() && { description: description.trim() }),
         prix: Number(prix),
+        type: typeFormation,
+        ...(typeFormation === "CONTINUE" && {
+          niveau: niveau as NiveauUniversitaire,
+        }),
       });
 
       setTitre("");
       setDescription("");
       setPrix("");
+      setTypeFormation("PROFESSIONNELLE");
+      setNiveau("");
       setShowCreateForm(false);
 
       await chargerFormations(1, recherche);
@@ -338,6 +358,9 @@ function FormationsAdminPage() {
         : ""
     );
 
+    setEditType(formation.type);
+    setEditNiveau(formation.niveau ?? "");
+
     setErreursEdit({});
   }
 
@@ -361,6 +384,8 @@ function FormationsAdminPage() {
     if (editTitre.trim().length < 3) nouvellesErreurs.titre = "Au moins 3 caractères";
     if (!isValidPrix(editPrix))
       nouvellesErreurs.prix = "Prix obligatoire, supérieur à 0 (exemple : 50000)";
+    if (editType === "CONTINUE" && !editNiveau)
+      nouvellesErreurs.niveau = "Le niveau est obligatoire pour une formation continue";
 
     if (Object.keys(nouvellesErreurs).length > 0) {
       setErreursEdit(nouvellesErreurs);
@@ -384,6 +409,13 @@ function FormationsAdminPage() {
               : null,
 
           prix: Number(editPrix),
+
+          type: editType,
+
+          niveau:
+            editType === "CONTINUE"
+              ? (editNiveau as NiveauUniversitaire)
+              : null,
         }
       );
 
@@ -553,6 +585,53 @@ function FormationsAdminPage() {
             >
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Type de formation
+                </label>
+
+                <select
+                  value={typeFormation}
+                  onChange={(event) => {
+                    setTypeFormation(event.target.value as TypeFormation);
+                    setNiveau("");
+                    setErreurs((prev) => ({ ...prev, niveau: "" }));
+                  }}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                >
+                  <option value="PROFESSIONNELLE">Formation professionnelle</option>
+                  <option value="CONTINUE">Formation continue (matière universitaire)</option>
+                </select>
+              </div>
+
+              {typeFormation === "CONTINUE" && (
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Niveau
+                  </label>
+
+                  <select
+                    value={niveau}
+                    onChange={(event) => {
+                      setNiveau(event.target.value);
+                      setErreurs((prev) => ({ ...prev, niveau: "" }));
+                    }}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                  >
+                    <option value="">Choisir un niveau</option>
+                    {NIVEAUX.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+
+                  {erreurs.niveau && (
+                    <p className="mt-1 text-sm text-red-600">{erreurs.niveau}</p>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Titre
                 </label>
 
@@ -623,6 +702,8 @@ function FormationsAdminPage() {
                     setTitre("");
                     setDescription("");
                     setPrix("");
+                    setTypeFormation("PROFESSIONNELLE");
+                    setNiveau("");
                     setErreurs({});
                   }}
                   className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700"
@@ -724,6 +805,10 @@ function FormationsAdminPage() {
                     </th>
 
                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase text-white">
+                      Type
+                    </th>
+
+                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase text-white">
                       Prix
                     </th>
 
@@ -777,6 +862,19 @@ function FormationsAdminPage() {
                               }
                             </p>
                           )}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                              formation.type === "CONTINUE"
+                                ? "bg-cyan-100 text-cyan-700"
+                                : "bg-violet-100 text-violet-700"
+                            }`}
+                          >
+                            {formatType(formation.type)}
+                            {formation.niveau ? ` · ${formation.niveau}` : ""}
+                          </span>
                         </td>
 
                         <td className="whitespace-nowrap px-5 py-4 text-sm font-semibold text-slate-900">
@@ -914,7 +1012,7 @@ function FormationsAdminPage() {
 
         {formationAModifier && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
               <h2 className="text-xl font-bold text-slate-900">
                 Modifier la formation
               </h2>
@@ -924,6 +1022,53 @@ function FormationsAdminPage() {
                 noValidate
                 className="mt-6 space-y-5"
               >
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Type de formation
+                  </label>
+
+                  <select
+                    value={editType}
+                    onChange={(event) => {
+                      setEditType(event.target.value as TypeFormation);
+                      setEditNiveau("");
+                      setErreursEdit((prev) => ({ ...prev, niveau: "" }));
+                    }}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                  >
+                    <option value="PROFESSIONNELLE">Formation professionnelle</option>
+                    <option value="CONTINUE">Formation continue (matière universitaire)</option>
+                  </select>
+                </div>
+
+                {editType === "CONTINUE" && (
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                      Niveau
+                    </label>
+
+                    <select
+                      value={editNiveau}
+                      onChange={(event) => {
+                        setEditNiveau(event.target.value);
+                        setErreursEdit((prev) => ({ ...prev, niveau: "" }));
+                      }}
+                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                    >
+                      <option value="">Choisir un niveau</option>
+                      {NIVEAUX.map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+
+                    {erreursEdit.niveau && (
+                      <p className="mt-1 text-sm text-red-600">{erreursEdit.niveau}</p>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-slate-700">
                     Titre

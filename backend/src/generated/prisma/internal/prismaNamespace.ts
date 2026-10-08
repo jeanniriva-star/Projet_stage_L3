@@ -1601,6 +1601,8 @@ export const FormationScalarFieldEnum = {
   titre: 'titre',
   description: 'description',
   prix: 'prix',
+  type: 'type',
+  niveau: 'niveau',
   createurId: 'createurId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1841,6 +1843,34 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TypeFormation'
+ */
+export type EnumTypeFormationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TypeFormation'>
+    
+
+
+/**
+ * Reference to a field of type 'TypeFormation[]'
+ */
+export type ListEnumTypeFormationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TypeFormation[]'>
+    
+
+
+/**
+ * Reference to a field of type 'NiveauUniversitaire'
+ */
+export type EnumNiveauUniversitaireFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NiveauUniversitaire'>
+    
+
+
+/**
+ * Reference to a field of type 'NiveauUniversitaire[]'
+ */
+export type ListEnumNiveauUniversitaireFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NiveauUniversitaire[]'>
     
 
 

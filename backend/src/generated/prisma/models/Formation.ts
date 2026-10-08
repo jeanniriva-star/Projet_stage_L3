@@ -39,6 +39,8 @@ export type FormationMinAggregateOutputType = {
   titre: string | null
   description: string | null
   prix: runtime.Decimal | null
+  type: $Enums.TypeFormation | null
+  niveau: $Enums.NiveauUniversitaire | null
   createurId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -49,6 +51,8 @@ export type FormationMaxAggregateOutputType = {
   titre: string | null
   description: string | null
   prix: runtime.Decimal | null
+  type: $Enums.TypeFormation | null
+  niveau: $Enums.NiveauUniversitaire | null
   createurId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +63,8 @@ export type FormationCountAggregateOutputType = {
   titre: number
   description: number
   prix: number
+  type: number
+  niveau: number
   createurId: number
   createdAt: number
   updatedAt: number
@@ -79,6 +85,8 @@ export type FormationMinAggregateInputType = {
   titre?: true
   description?: true
   prix?: true
+  type?: true
+  niveau?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -89,6 +97,8 @@ export type FormationMaxAggregateInputType = {
   titre?: true
   description?: true
   prix?: true
+  type?: true
+  niveau?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +109,8 @@ export type FormationCountAggregateInputType = {
   titre?: true
   description?: true
   prix?: true
+  type?: true
+  niveau?: true
   createurId?: true
   createdAt?: true
   updatedAt?: true
@@ -196,6 +208,8 @@ export type FormationGroupByOutputType = {
   titre: string
   description: string | null
   prix: runtime.Decimal
+  type: $Enums.TypeFormation
+  niveau: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt: Date
   updatedAt: Date
@@ -229,6 +243,8 @@ export type FormationWhereInput = {
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
   prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFilter<"Formation"> | $Enums.TypeFormation
+  niveau?: Prisma.EnumNiveauUniversitaireNullableFilter<"Formation"> | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -244,6 +260,8 @@ export type FormationOrderByWithRelationInput = {
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   prix?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  niveau?: Prisma.SortOrderInput | Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -262,6 +280,8 @@ export type FormationWhereUniqueInput = Prisma.AtLeast<{
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
   prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFilter<"Formation"> | $Enums.TypeFormation
+  niveau?: Prisma.EnumNiveauUniversitaireNullableFilter<"Formation"> | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -277,6 +297,8 @@ export type FormationOrderByWithAggregationInput = {
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   prix?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  niveau?: Prisma.SortOrderInput | Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -295,6 +317,8 @@ export type FormationScalarWhereWithAggregatesInput = {
   titre?: Prisma.StringWithAggregatesFilter<"Formation"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Formation"> | string | null
   prix?: Prisma.DecimalWithAggregatesFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationWithAggregatesFilter<"Formation"> | $Enums.TypeFormation
+  niveau?: Prisma.EnumNiveauUniversitaireNullableWithAggregatesFilter<"Formation"> | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringWithAggregatesFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Formation"> | Date | string
@@ -305,6 +329,8 @@ export type FormationCreateInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -319,6 +345,8 @@ export type FormationUncheckedCreateInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -333,6 +361,8 @@ export type FormationUpdateInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -347,6 +377,8 @@ export type FormationUncheckedUpdateInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -361,6 +393,8 @@ export type FormationCreateManyInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -371,6 +405,8 @@ export type FormationUpdateManyMutationInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -380,6 +416,8 @@ export type FormationUncheckedUpdateManyInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -400,6 +438,8 @@ export type FormationCountOrderByAggregateInput = {
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
   prix?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  niveau?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -414,6 +454,8 @@ export type FormationMaxOrderByAggregateInput = {
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
   prix?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  niveau?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -424,6 +466,8 @@ export type FormationMinOrderByAggregateInput = {
   titre?: Prisma.SortOrder
   description?: Prisma.SortOrder
   prix?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  niveau?: Prisma.SortOrder
   createurId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -492,6 +536,14 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type EnumTypeFormationFieldUpdateOperationsInput = {
+  set?: $Enums.TypeFormation
+}
+
+export type NullableEnumNiveauUniversitaireFieldUpdateOperationsInput = {
+  set?: $Enums.NiveauUniversitaire | null
+}
+
 export type FormationCreateNestedOneWithoutAffectationsInput = {
   create?: Prisma.XOR<Prisma.FormationCreateWithoutAffectationsInput, Prisma.FormationUncheckedCreateWithoutAffectationsInput>
   connectOrCreate?: Prisma.FormationCreateOrConnectWithoutAffectationsInput
@@ -553,6 +605,8 @@ export type FormationCreateWithoutCreateurInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationFormateurCreateNestedManyWithoutFormationInput
@@ -566,6 +620,8 @@ export type FormationUncheckedCreateWithoutCreateurInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   affectations?: Prisma.AffectationFormateurUncheckedCreateNestedManyWithoutFormationInput
@@ -608,6 +664,8 @@ export type FormationScalarWhereInput = {
   titre?: Prisma.StringFilter<"Formation"> | string
   description?: Prisma.StringNullableFilter<"Formation"> | string | null
   prix?: Prisma.DecimalFilter<"Formation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFilter<"Formation"> | $Enums.TypeFormation
+  niveau?: Prisma.EnumNiveauUniversitaireNullableFilter<"Formation"> | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFilter<"Formation"> | string
   createdAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Formation"> | Date | string
@@ -618,6 +676,8 @@ export type FormationCreateWithoutAffectationsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -631,6 +691,8 @@ export type FormationUncheckedCreateWithoutAffectationsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -660,6 +722,8 @@ export type FormationUpdateWithoutAffectationsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -673,6 +737,8 @@ export type FormationUncheckedUpdateWithoutAffectationsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -686,6 +752,8 @@ export type FormationCreateWithoutCoursInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -699,6 +767,8 @@ export type FormationUncheckedCreateWithoutCoursInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -728,6 +798,8 @@ export type FormationUpdateWithoutCoursInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -741,6 +813,8 @@ export type FormationUncheckedUpdateWithoutCoursInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -754,6 +828,8 @@ export type FormationCreateWithoutSessionsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -767,6 +843,8 @@ export type FormationUncheckedCreateWithoutSessionsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -796,6 +874,8 @@ export type FormationUpdateWithoutSessionsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -809,6 +889,8 @@ export type FormationUncheckedUpdateWithoutSessionsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -822,6 +904,8 @@ export type FormationCreateWithoutInscriptionsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createur: Prisma.UserCreateNestedOneWithoutFormationsCreeesInput
@@ -835,6 +919,8 @@ export type FormationUncheckedCreateWithoutInscriptionsInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createurId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -864,6 +950,8 @@ export type FormationUpdateWithoutInscriptionsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createur?: Prisma.UserUpdateOneRequiredWithoutFormationsCreeesNestedInput
@@ -877,6 +965,8 @@ export type FormationUncheckedUpdateWithoutInscriptionsInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createurId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -890,6 +980,8 @@ export type FormationCreateManyCreateurInput = {
   titre: string
   description?: string | null
   prix?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: $Enums.TypeFormation
+  niveau?: $Enums.NiveauUniversitaire | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -899,6 +991,8 @@ export type FormationUpdateWithoutCreateurInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationFormateurUpdateManyWithoutFormationNestedInput
@@ -912,6 +1006,8 @@ export type FormationUncheckedUpdateWithoutCreateurInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   affectations?: Prisma.AffectationFormateurUncheckedUpdateManyWithoutFormationNestedInput
@@ -925,6 +1021,8 @@ export type FormationUncheckedUpdateManyWithoutCreateurInput = {
   titre?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prix?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  type?: Prisma.EnumTypeFormationFieldUpdateOperationsInput | $Enums.TypeFormation
+  niveau?: Prisma.NullableEnumNiveauUniversitaireFieldUpdateOperationsInput | $Enums.NiveauUniversitaire | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -992,6 +1090,8 @@ export type FormationSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   titre?: boolean
   description?: boolean
   prix?: boolean
+  type?: boolean
+  niveau?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1008,6 +1108,8 @@ export type FormationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   titre?: boolean
   description?: boolean
   prix?: boolean
+  type?: boolean
+  niveau?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1019,6 +1121,8 @@ export type FormationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   titre?: boolean
   description?: boolean
   prix?: boolean
+  type?: boolean
+  niveau?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1030,12 +1134,14 @@ export type FormationSelectScalar = {
   titre?: boolean
   description?: boolean
   prix?: boolean
+  type?: boolean
+  niveau?: boolean
   createurId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titre" | "description" | "prix" | "createurId" | "createdAt" | "updatedAt", ExtArgs["result"]["formation"]>
+export type FormationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titre" | "description" | "prix" | "type" | "niveau" | "createurId" | "createdAt" | "updatedAt", ExtArgs["result"]["formation"]>
 export type FormationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createur?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   affectations?: boolean | Prisma.Formation$affectationsArgs<ExtArgs>
@@ -1065,6 +1171,8 @@ export type $FormationPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     titre: string
     description: string | null
     prix: runtime.Decimal
+    type: $Enums.TypeFormation
+    niveau: $Enums.NiveauUniversitaire | null
     createurId: string
     createdAt: Date
     updatedAt: Date
@@ -1500,6 +1608,8 @@ export interface FormationFieldRefs {
   readonly titre: Prisma.FieldRef<"Formation", 'String'>
   readonly description: Prisma.FieldRef<"Formation", 'String'>
   readonly prix: Prisma.FieldRef<"Formation", 'Decimal'>
+  readonly type: Prisma.FieldRef<"Formation", 'TypeFormation'>
+  readonly niveau: Prisma.FieldRef<"Formation", 'NiveauUniversitaire'>
   readonly createurId: Prisma.FieldRef<"Formation", 'String'>
   readonly createdAt: Prisma.FieldRef<"Formation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Formation", 'DateTime'>
