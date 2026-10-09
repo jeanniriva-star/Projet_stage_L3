@@ -3,18 +3,6 @@ import {
   useState,
   type FormEvent,
 } from "react";
-import { Eye, EyeOff } from "lucide-react";
-
-import axios from "axios";
-import {
-  onlyLetters,
-  onlyPhone,
-  onlyEmailChars,
-  isValidName,
-  isValidEmailInscription,
-  isValidPassword,
-  isValidPhone,
-} from "../../utils/validation";
 
 import {
   checkUserDeletionAdmin,
@@ -23,15 +11,15 @@ import {
   getUsersAdmin,
 } from "../../services/user.service";
 import type {
+  CreateUserAdminData,
   DeleteCheckResponse,
   UserAdmin,
 } from "../../types/user.types";
+import { getErrorMessage } from "../../utils/errors";
 import Pagination from "../../components/common/Pagination";
-import {
-  formatDate,
-  roleClass,
-  roleLabel,
-} from "../../utils/userHelpers";
+import UserCreateForm from "../../components/admin/utilisateurs/UserCreateForm";
+import UsersFilters from "../../components/admin/utilisateurs/UsersFilters";
+import UsersTable from "../../components/admin/utilisateurs/UsersTable";
 import DeleteWarningModal from "../../components/admin/utilisateurs/DeleteWarningModal";
 import DeleteVerificationModal from "../../components/admin/utilisateurs/DeleteVerificationModal";
 import DeleteConfirmModal from "../../components/admin/utilisateurs/DeleteConfirmModal";
@@ -65,60 +53,24 @@ function UtilisateursAdminPage() {
   // =====================================================
 
   const [showCreateForm, setShowCreateForm] = useState(false);
-
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [telephone, setTelephone] = useState("");
-  const [adresse, setAdresse] = useState("");
-  const [deleting, setDeleting] = useState(false);
-
-  const [roleCreation, setRoleCreation] = useState<
-    "ADMIN" | "FORMATEUR"
-  >("FORMATEUR");
-
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
-  const [erreurs, setErreurs] = useState<Record<string, string>>({});
-  const [afficherMdp, setAfficherMdp] = useState(false);
-
-  const effacerErreur = (champ: string) =>
-    setErreurs((prev) => ({ ...prev, [champ]: "" }));
-
-  const [
-    verificationData,
-    setVerificationData,
-  ] = useState<DeleteCheckResponse | null>(null);
-
-  const [
-    loadingVerification,
-    setLoadingVerification,
-  ] = useState(false);
-
-  const [
-    showVerificationDetails,
-    setShowVerificationDetails,
-  ] = useState(false);
 
   // =====================================================
   // SUPPRESSION
   // =====================================================
 
-  const [
-    utilisateurASupprimer,
-    setUtilisateurASupprimer,
-  ] = useState<UserAdmin | null>(null);
+  const [utilisateurASupprimer, setUtilisateurASupprimer] =
+    useState<UserAdmin | null>(null);
+  const [showWarningSuppression, setShowWarningSuppression] = useState(false);
+  const [showConfirmationSuppression, setShowConfirmationSuppression] =
+    useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const [
-    showWarningSuppression,
-    setShowWarningSuppression,
-  ] = useState(false);
-
-  const [
-    showConfirmationSuppression,
-    setShowConfirmationSuppression,
-  ] = useState(false);
+  const [verificationData, setVerificationData] =
+    useState<DeleteCheckResponse | null>(null);
+  const [loadingVerification, setLoadingVerification] = useState(false);
+  const [showVerificationDetails, setShowVerificationDetails] = useState(false);
 
   // =====================================================
   // CHARGEMENT
@@ -145,21 +97,8 @@ function UtilisateursAdminPage() {
       setTotalPages(data.pagination.totalPages);
       setTotal(data.pagination.total);
     } catch (err: unknown) {
-      console.error(
-        "Erreur utilisateurs admin :",
-        err
-      );
-
-      if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message ??
-            "Impossible de charger les utilisateurs."
-        );
-      } else {
-        setError(
-          "Impossible de charger les utilisateurs."
-        );
-      }
+      console.error("Erreur utilisateurs admin :", err);
+      setError(getErrorMessage(err, "Impossible de charger les utilisateurs."));
     } finally {
       setLoading(false);
     }
@@ -174,12 +113,7 @@ function UtilisateursAdminPage() {
 
     async function initialiser() {
       try {
-        const data = await getUsersAdmin(
-          1,
-          10,
-          "",
-          ""
-        );
+        const data = await getUsersAdmin(1, 10, "", "");
 
         if (annule) {
           return;
@@ -194,21 +128,8 @@ function UtilisateursAdminPage() {
           return;
         }
 
-        console.error(
-          "Erreur utilisateurs admin :",
-          err
-        );
-
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message ??
-              "Impossible de charger les utilisateurs."
-          );
-        } else {
-          setError(
-            "Impossible de charger les utilisateurs."
-          );
-        }
+        console.error("Erreur utilisateurs admin :", err);
+        setError(getErrorMessage(err, "Impossible de charger les utilisateurs."));
       } finally {
         if (!annule) {
           setLoading(false);
@@ -224,129 +145,55 @@ function UtilisateursAdminPage() {
   }, []);
 
   // =====================================================
-  // RECHERCHE
+  // RECHERCHE ET FILTRES
   // =====================================================
 
-  async function handleRecherche(
-    event: FormEvent<HTMLFormElement>
-  ) {
+  async function handleRecherche(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    await chargerUtilisateurs(
-      1,
-      recherche,
-      roleFiltre
-    );
+    await chargerUtilisateurs(1, recherche, roleFiltre);
   }
 
-  // =====================================================
-  // FILTRE RÔLE
-  // =====================================================
-
-  async function handleRoleFilter(
-    role: string
-  ) {
+  async function handleRoleFilter(role: string) {
     setRoleFiltre(role);
 
-    await chargerUtilisateurs(
-      1,
-      recherche,
-      role
-    );
+    await chargerUtilisateurs(1, recherche, role);
   }
 
-  // =====================================================
-  // RESET CRÉATION
-  // =====================================================
+  function handleResetFiltres() {
+    setRecherche("");
+    setRoleFiltre("");
 
-  function resetCreation() {
-    setNom("");
-    setPrenom("");
-    setEmail("");
-    setPassword("");
-    setTelephone("");
-    setAdresse("");
-    setRoleCreation("FORMATEUR");
-    setCreateError("");
-    setErreurs({});
-    setAfficherMdp(false);
+    void chargerUtilisateurs(1, "", "");
   }
 
   // =====================================================
   // CRÉER UTILISATEUR
   // =====================================================
 
-  async function handleCreerUtilisateur(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
-
-    const nouvellesErreurs: Record<string, string> = {};
-
-    if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
-    if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
-    if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
-    if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
-    if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
-    if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
-
-    if (Object.keys(nouvellesErreurs).length > 0) {
-      setErreurs(nouvellesErreurs);
-      return;
-    }
-
-    setErreurs({});
-
+  async function handleCreerUtilisateur(data: CreateUserAdminData) {
     try {
       setCreating(true);
       setCreateError("");
 
-      await createUserAdmin({
-        nom: nom.trim(),
-        prenom: prenom.trim(),
-        email: email.trim(),
-        password,
-        telephone: telephone.trim(),
-        adresse: adresse.trim(),
-        role: roleCreation,
-      });
+      await createUserAdmin(data);
 
-      resetCreation();
       setShowCreateForm(false);
 
-      await chargerUtilisateurs(
-        1,
-        recherche,
-        roleFiltre
-      );
+      await chargerUtilisateurs(1, recherche, roleFiltre);
     } catch (err: unknown) {
-      console.error(
-        "Erreur création utilisateur :",
-        err
-      );
-
-      if (axios.isAxiosError(err)) {
-        setCreateError(
-          err.response?.data?.message ??
-            "Impossible de créer l'utilisateur."
-        );
-      } else {
-        setCreateError(
-          "Impossible de créer l'utilisateur."
-        );
-      }
+      console.error("Erreur création utilisateur :", err);
+      setCreateError(getErrorMessage(err, "Impossible de créer l'utilisateur."));
     } finally {
       setCreating(false);
     }
   }
 
   // =====================================================
-  // DEMANDE DE SUPPRESSION
+  // SUPPRESSION
   // =====================================================
 
-  function handleDemandeSuppression(
-    utilisateur: UserAdmin
-  ) {
+  function handleDemandeSuppression(utilisateur: UserAdmin) {
     setUtilisateurASupprimer(utilisateur);
 
     if (
@@ -360,10 +207,6 @@ function UtilisateursAdminPage() {
     setShowConfirmationSuppression(true);
   }
 
-  // =====================================================
-  // VÉRIFIER UTILISATEUR
-  // =====================================================
-
   async function handleVerifierUtilisateur() {
     if (!utilisateurASupprimer) {
       return;
@@ -372,48 +215,29 @@ function UtilisateursAdminPage() {
     try {
       setLoadingVerification(true);
 
-      const data =
-        await checkUserDeletionAdmin(
-          utilisateurASupprimer.id
-        );
+      const data = await checkUserDeletionAdmin(utilisateurASupprimer.id);
 
       setVerificationData(data);
 
       setShowWarningSuppression(false);
       setShowVerificationDetails(true);
     } catch (err: unknown) {
-      console.error(
-        "Erreur vérification utilisateur :",
-        err
-      );
-
-      if (axios.isAxiosError(err)) {
-        window.alert(
-          err.response?.data?.message ??
-            "Impossible de vérifier les données de cet utilisateur."
-        );
-      } else {
-        window.alert(
+      console.error("Erreur vérification utilisateur :", err);
+      window.alert(
+        getErrorMessage(
+          err,
           "Impossible de vérifier les données de cet utilisateur."
-        );
-      }
+        )
+      );
     } finally {
       setLoadingVerification(false);
     }
   }
 
-  // =====================================================
-  // CONTINUER SUPPRESSION
-  // =====================================================
-
   function handleContinuerSuppression() {
     setShowWarningSuppression(false);
     setShowConfirmationSuppression(true);
   }
-
-  // =====================================================
-  // ANNULER SUPPRESSION
-  // =====================================================
 
   function handleAnnulerSuppression() {
     setShowWarningSuppression(false);
@@ -421,28 +245,16 @@ function UtilisateursAdminPage() {
     setUtilisateurASupprimer(null);
   }
 
-  // =====================================================
-  // FERMER LA VÉRIFICATION
-  // =====================================================
-
   function handleFermerVerification() {
     setShowVerificationDetails(false);
     setVerificationData(null);
     setUtilisateurASupprimer(null);
   }
 
-  // =====================================================
-  // CONTINUER APRÈS LA VÉRIFICATION
-  // =====================================================
-
   function handleContinuerApresVerification() {
     setShowVerificationDetails(false);
     setShowConfirmationSuppression(true);
   }
-
-  // =====================================================
-  // CONFIRMATION FINALE
-  // =====================================================
 
   async function handleConfirmationFinale() {
     if (!utilisateurASupprimer) {
@@ -452,39 +264,19 @@ function UtilisateursAdminPage() {
     try {
       setDeleting(true);
 
-      const resultat =
-        await deleteUserAdmin(
-          utilisateurASupprimer.id
-        );
+      const resultat = await deleteUserAdmin(utilisateurASupprimer.id);
 
       setShowConfirmationSuppression(false);
       setUtilisateurASupprimer(null);
 
-      window.alert(
-        resultat.message
-      );
+      window.alert(resultat.message);
 
-      await chargerUtilisateurs(
-        page,
-        recherche,
-        roleFiltre
-      );
+      await chargerUtilisateurs(page, recherche, roleFiltre);
     } catch (err: unknown) {
-      console.error(
-        "Erreur suppression utilisateur :",
-        err
+      console.error("Erreur suppression utilisateur :", err);
+      window.alert(
+        getErrorMessage(err, "Impossible de supprimer cet utilisateur.")
       );
-
-      if (axios.isAxiosError(err)) {
-        window.alert(
-          err.response?.data?.message ??
-            "Impossible de supprimer cet utilisateur."
-        );
-      } else {
-        window.alert(
-          "Impossible de supprimer cet utilisateur."
-        );
-      }
     } finally {
       setDeleting(false);
     }
@@ -497,11 +289,6 @@ function UtilisateursAdminPage() {
   return (
     <div className="px-6 py-8">
       <div className="mx-auto max-w-7xl">
-
-        {/* =================================================
-            HEADER
-        ================================================= */}
-
         <header className="border-b border-slate-200 pb-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
             Administration
@@ -514,8 +301,7 @@ function UtilisateursAdminPage() {
               </h1>
 
               <p className="mt-2 text-slate-600">
-                Gérez les comptes utilisateurs
-                de la plateforme.
+                Gérez les comptes utilisateurs de la plateforme.
               </p>
 
               <p className="mt-3 text-sm text-slate-500">
@@ -527,268 +313,33 @@ function UtilisateursAdminPage() {
             <button
               type="button"
               onClick={() => {
-                setShowCreateForm(
-                  (current) => !current
-                );
-
+                setShowCreateForm((current) => !current);
                 setCreateError("");
               }}
               className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700"
             >
-              {showCreateForm
-                ? "Fermer"
-                : "Créer un utilisateur"}
+              {showCreateForm ? "Fermer" : "Créer un utilisateur"}
             </button>
           </div>
         </header>
 
-        {/* =================================================
-            CRÉATION UTILISATEUR
-        ================================================= */}
-
         {showCreateForm && (
-          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900">
-              Nouvel utilisateur
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Créer un compte administrateur
-              ou formateur.
-            </p>
-
-            <form onSubmit={handleCreerUtilisateur} noValidate className="mt-6">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Nom</label>
-                  <input
-                    type="text"
-                    value={nom}
-                    onChange={(e) => {
-                      setNom(onlyLetters(e.target.value));
-                      effacerErreur("nom");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                  {erreurs.nom && <p className="mt-1 text-sm text-red-600">{erreurs.nom}</p>}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Prénom</label>
-                  <input
-                    type="text"
-                    value={prenom}
-                    onChange={(e) => {
-                      setPrenom(onlyLetters(e.target.value));
-                      effacerErreur("prenom");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                  {erreurs.prenom && <p className="mt-1 text-sm text-red-600">{erreurs.prenom}</p>}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(onlyEmailChars(e.target.value));
-                      effacerErreur("email");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                  {erreurs.email && <p className="mt-1 text-sm text-red-600">{erreurs.email}</p>}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Téléphone</label>
-                  <input
-                    type="tel"
-                    value={telephone}
-                    onChange={(e) => {
-                      setTelephone(onlyPhone(e.target.value));
-                      effacerErreur("telephone");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                  {erreurs.telephone && <p className="mt-1 text-sm text-red-600">{erreurs.telephone}</p>}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Adresse</label>
-                  <input
-                    type="text"
-                    value={adresse}
-                    onChange={(e) => {
-                      setAdresse(e.target.value);
-                      effacerErreur("adresse");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                  />
-                  {erreurs.adresse && <p className="mt-1 text-sm text-red-600">{erreurs.adresse}</p>}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Rôle</label>
-                  <select
-                    value={roleCreation}
-                    onChange={(e) => setRoleCreation(e.target.value as "ADMIN" | "FORMATEUR")}
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
-                  >
-                    <option value="FORMATEUR">Formateur</option>
-                    <option value="ADMIN">Administrateur</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Mot de passe</label>
-
-                <div className="relative">
-                  <input
-                    type={afficherMdp ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      effacerErreur("password");
-                    }}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-cyan-600"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setAfficherMdp(!afficherMdp)}
-                    aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
-                    className="absolute inset-y-0 right-0 flex items-center px-4
-                              text-slate-400 hover:text-slate-600"
-                  >
-                    {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-
-                {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
-              </div>
-
-              {createError && <p className="mt-4 text-sm text-red-600">{createError}</p>}
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetCreation();
-                    setShowCreateForm(false);
-                  }}
-                  className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  Annuler
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={creating}
-                  className="rounded-xl bg-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {creating ? "Création..." : "Créer"}
-                </button>
-              </div>
-            </form>
-          </section>
+          <UserCreateForm
+            creating={creating}
+            createError={createError}
+            onSubmit={handleCreerUtilisateur}
+            onCancel={() => setShowCreateForm(false)}
+          />
         )}
 
-        {/* =================================================
-            FILTRES
-        ================================================= */}
-
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <form
-            onSubmit={handleRecherche}
-            className="grid gap-4 lg:grid-cols-[1fr_220px_auto]"
-          >
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Rechercher
-              </label>
-
-              <input
-                type="search"
-                value={recherche}
-                onChange={(event) =>
-                  setRecherche(
-                    event.target.value
-                  )
-                }
-                placeholder="Nom, prénom, email ou téléphone..."
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-cyan-600"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Rôle
-              </label>
-
-              <select
-                value={roleFiltre}
-                onChange={(event) =>
-                  handleRoleFilter(
-                    event.target.value
-                  )
-                }
-                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-600"
-              >
-                <option value="">
-                  Tous
-                </option>
-
-                <option value="ADMIN">
-                  Administrateurs
-                </option>
-
-                <option value="FORMATEUR">
-                  Formateurs
-                </option>
-
-                <option value="APPRENANT">
-                  Apprenants
-                </option>
-              </select>
-            </div>
-
-            <div className="flex items-end">
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700"
-              >
-                Rechercher
-              </button>
-            </div>
-          </form>
-
-          {(recherche ||
-            roleFiltre) && (
-            <button
-              type="button"
-              onClick={() => {
-                setRecherche("");
-                setRoleFiltre("");
-
-                void chargerUtilisateurs(
-                  1,
-                  "",
-                  ""
-                );
-              }}
-              className="mt-4 text-sm font-semibold text-cyan-700 hover:text-cyan-800"
-            >
-              Réinitialiser les filtres
-            </button>
-          )}
-        </section>
-
-        {/* =================================================
-            ERREUR
-        ================================================= */}
+        <UsersFilters
+          recherche={recherche}
+          roleFiltre={roleFiltre}
+          onRechercheChange={setRecherche}
+          onRoleChange={handleRoleFilter}
+          onSubmit={handleRecherche}
+          onReset={handleResetFiltres}
+        />
 
         {error && (
           <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -796,149 +347,34 @@ function UtilisateursAdminPage() {
           </div>
         )}
 
-        {/* =================================================
-            TABLEAU
-        ================================================= */}
-
         {loading ? (
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 text-slate-500">
             Chargement des utilisateurs...
           </div>
         ) : utilisateurs.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-10 text-center">
-            <h2 className="font-bold text-slate-900">
-              Aucun utilisateur
-            </h2>
+            <h2 className="font-bold text-slate-900">Aucun utilisateur</h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              Aucun utilisateur ne correspond
-              à vos critères.
+              Aucun utilisateur ne correspond à vos critères.
             </p>
           </div>
         ) : (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-
-                <thead className="bg-slate-950">
-                  <tr>
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Utilisateur
-                    </th>
-
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Email
-                    </th>
-
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Téléphone
-                    </th>
-
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Adresse
-                    </th>
-
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Rôle
-                    </th>
-
-                    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-white">
-                      Créé le
-                    </th>
-
-                    <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wider text-white">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {utilisateurs.map(
-                    (utilisateur) => (
-                      <tr
-                        key={utilisateur.id}
-                        className="transition hover:bg-slate-50"
-                      >
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <p className="font-semibold text-slate-900">
-                            {utilisateur.prenom}{" "}
-                            {utilisateur.nom}
-                          </p>
-                        </td>
-
-                        <td className="px-5 py-4 text-sm text-slate-600">
-                          {utilisateur.email}
-                        </td>
-
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
-                          {utilisateur.telephone}
-                        </td>
-
-                        <td className="px-5 py-4 text-sm text-slate-600">
-                          {utilisateur.adresse}
-                        </td>
-
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${roleClass(
-                              utilisateur.role
-                            )}`}
-                          >
-                            {roleLabel(
-                              utilisateur.role
-                            )}
-                          </span>
-                        </td>
-
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
-                          {formatDate(
-                            utilisateur.createdAt
-                          )}
-                        </td>
-
-                        <td className="whitespace-nowrap px-5 py-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDemandeSuppression(
-                                utilisateur
-                              )
-                            }
-                            className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-                          >
-                            Supprimer
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <UsersTable
+            utilisateurs={utilisateurs}
+            onDelete={handleDemandeSuppression}
+          />
         )}
-
-        {/* =================================================
-            PAGINATION
-        ================================================= */}
 
         {!loading && (
           <Pagination
             page={page}
             totalPages={totalPages}
             onChange={(nouvellePage) =>
-              void chargerUtilisateurs(
-                nouvellePage,
-                recherche,
-                roleFiltre
-              )
+              void chargerUtilisateurs(nouvellePage, recherche, roleFiltre)
             }
           />
         )}
-
-        {/* =================================================
-            FENÊTRES DE SUPPRESSION
-        ================================================= */}
 
         {showWarningSuppression && utilisateurASupprimer && (
           <DeleteWarningModal
