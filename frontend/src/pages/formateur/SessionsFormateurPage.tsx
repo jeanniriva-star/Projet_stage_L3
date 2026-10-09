@@ -14,17 +14,12 @@ import {
   terminerSession,
   creerSession,
   getPresencesSession,
-  type SessionFormateur,
-  type PresencesSessionResponse,
 } from "../../services/session.service";
+import type {
+  PresencesSessionResponse,
+  SessionAvecFormation,
+} from "../../types/session.types";
 
-interface SessionAvecFormation
-  extends SessionFormateur {
-  formation: {
-    id: string;
-    titre: string;
-  };
-}
 
 function SessionsFormateurPage() {
   const navigate = useNavigate();

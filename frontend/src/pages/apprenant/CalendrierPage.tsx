@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import {
   getMesSessions,
   getMaPresenceSession,
-  type SessionApprenant,
-  type MaPresenceSessionResponse,
 } from "../../services/session.service";
+import type {
+  SessionApprenant,
+  MaPresenceSessionResponse,
+} from "../../types/session.types";
 
 function CalendrierPage() {
   const navigate = useNavigate();
