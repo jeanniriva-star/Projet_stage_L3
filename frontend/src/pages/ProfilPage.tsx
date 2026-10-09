@@ -5,8 +5,8 @@ import {
   getMonProfil,
   updateMonProfil,
   changerMotDePasse,
-  type MonProfil,
 } from "../services/user.service";
+import type { MonProfil } from "../types/user.types";
 import {
   onlyLetters,
   onlyPhone,

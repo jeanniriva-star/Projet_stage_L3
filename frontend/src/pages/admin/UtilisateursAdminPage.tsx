@@ -21,31 +21,20 @@ import {
   createUserAdmin,
   deleteUserAdmin,
   getUsersAdmin,
-  type DeleteCheckAdmin,
-  type DeleteCheckApprenant,
-  type DeleteCheckFormateur,
-  type DeleteCheckResponse,
-  type UserAdmin,
-  type UserRole,
 } from "../../services/user.service";
-
-function isDeleteCheckApprenant(
-  data: DeleteCheckResponse
-): data is DeleteCheckApprenant {
-  return data.user.role === "APPRENANT";
-}
-
-function isDeleteCheckFormateur(
-  data: DeleteCheckResponse
-): data is DeleteCheckFormateur {
-  return data.user.role === "FORMATEUR";
-}
-
-function isDeleteCheckAdmin(
-  data: DeleteCheckResponse
-): data is DeleteCheckAdmin {
-  return data.user.role === "ADMIN";
-}
+import type {
+  DeleteCheckResponse,
+  UserAdmin,
+} from "../../types/user.types";
+import Pagination from "../../components/common/Pagination";
+import {
+  formatDate,
+  roleClass,
+  roleLabel,
+} from "../../utils/userHelpers";
+import DeleteWarningModal from "../../components/admin/utilisateurs/DeleteWarningModal";
+import DeleteVerificationModal from "../../components/admin/utilisateurs/DeleteVerificationModal";
+import DeleteConfirmModal from "../../components/admin/utilisateurs/DeleteConfirmModal";
 
 function UtilisateursAdminPage() {
   // =====================================================
@@ -83,10 +72,7 @@ function UtilisateursAdminPage() {
   const [password, setPassword] = useState("");
   const [telephone, setTelephone] = useState("");
   const [adresse, setAdresse] = useState("");
-  const [
-  deleting,
-  setDeleting,
-] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [roleCreation, setRoleCreation] = useState<
     "ADMIN" | "FORMATEUR"
@@ -97,22 +83,23 @@ function UtilisateursAdminPage() {
   const [erreurs, setErreurs] = useState<Record<string, string>>({});
   const [afficherMdp, setAfficherMdp] = useState(false);
 
-const effacerErreur = (champ: string) =>
-  setErreurs((prev) => ({ ...prev, [champ]: "" }));
+  const effacerErreur = (champ: string) =>
+    setErreurs((prev) => ({ ...prev, [champ]: "" }));
+
   const [
-  verificationData,
-  setVerificationData,
-] = useState<DeleteCheckResponse | null>(null);
+    verificationData,
+    setVerificationData,
+  ] = useState<DeleteCheckResponse | null>(null);
 
-const [
-  loadingVerification,
-  setLoadingVerification,
-] = useState(false);
+  const [
+    loadingVerification,
+    setLoadingVerification,
+  ] = useState(false);
 
-const [
-  showVerificationDetails,
-  setShowVerificationDetails,
-] = useState(false);
+  const [
+    showVerificationDetails,
+    setShowVerificationDetails,
+  ] = useState(false);
 
   // =====================================================
   // SUPPRESSION
@@ -294,21 +281,21 @@ const [
   ) {
     event.preventDefault();
 
-   const nouvellesErreurs: Record<string, string> = {};
+    const nouvellesErreurs: Record<string, string> = {};
 
-if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
-if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
-if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
-if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
-if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
-if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
+    if (!isValidName(nom)) nouvellesErreurs.nom = "Au moins 2 lettres";
+    if (!isValidName(prenom)) nouvellesErreurs.prenom = "Au moins 2 lettres";
+    if (!isValidEmailInscription(email)) nouvellesErreurs.email = "Uniquement lettres et chiffres (exemple : nom@domaine.com)";
+    if (!isValidPassword(password)) nouvellesErreurs.password = "Minimum 8 caractères";
+    if (!isValidPhone(telephone)) nouvellesErreurs.telephone = "8 à 15 chiffres (le + est accepté au début)";
+    if (adresse.trim().length < 3) nouvellesErreurs.adresse = "Adresse trop courte";
 
-if (Object.keys(nouvellesErreurs).length > 0) {
-  setErreurs(nouvellesErreurs);
-  return;
-}
+    if (Object.keys(nouvellesErreurs).length > 0) {
+      setErreurs(nouvellesErreurs);
+      return;
+    }
 
-setErreurs({});
+    setErreurs({});
 
     try {
       setCreating(true);
@@ -377,43 +364,43 @@ setErreurs({});
   // VÉRIFIER UTILISATEUR
   // =====================================================
 
- async function handleVerifierUtilisateur() {
-  if (!utilisateurASupprimer) {
-    return;
-  }
-
-  try {
-    setLoadingVerification(true);
-
-    const data =
-      await checkUserDeletionAdmin(
-        utilisateurASupprimer.id
-      );
-
-    setVerificationData(data);
-
-    setShowWarningSuppression(false);
-    setShowVerificationDetails(true);
-  } catch (err: unknown) {
-    console.error(
-      "Erreur vérification utilisateur :",
-      err
-    );
-
-    if (axios.isAxiosError(err)) {
-      window.alert(
-        err.response?.data?.message ??
-          "Impossible de vérifier les données de cet utilisateur."
-      );
-    } else {
-      window.alert(
-        "Impossible de vérifier les données de cet utilisateur."
-      );
+  async function handleVerifierUtilisateur() {
+    if (!utilisateurASupprimer) {
+      return;
     }
-  } finally {
-    setLoadingVerification(false);
+
+    try {
+      setLoadingVerification(true);
+
+      const data =
+        await checkUserDeletionAdmin(
+          utilisateurASupprimer.id
+        );
+
+      setVerificationData(data);
+
+      setShowWarningSuppression(false);
+      setShowVerificationDetails(true);
+    } catch (err: unknown) {
+      console.error(
+        "Erreur vérification utilisateur :",
+        err
+      );
+
+      if (axios.isAxiosError(err)) {
+        window.alert(
+          err.response?.data?.message ??
+            "Impossible de vérifier les données de cet utilisateur."
+        );
+      } else {
+        window.alert(
+          "Impossible de vérifier les données de cet utilisateur."
+        );
+      }
+    } finally {
+      setLoadingVerification(false);
+    }
   }
-}
 
   // =====================================================
   // CONTINUER SUPPRESSION
@@ -435,112 +422,71 @@ setErreurs({});
   }
 
   // =====================================================
+  // FERMER LA VÉRIFICATION
+  // =====================================================
+
+  function handleFermerVerification() {
+    setShowVerificationDetails(false);
+    setVerificationData(null);
+    setUtilisateurASupprimer(null);
+  }
+
+  // =====================================================
+  // CONTINUER APRÈS LA VÉRIFICATION
+  // =====================================================
+
+  function handleContinuerApresVerification() {
+    setShowVerificationDetails(false);
+    setShowConfirmationSuppression(true);
+  }
+
+  // =====================================================
   // CONFIRMATION FINALE
   // =====================================================
 
-async function handleConfirmationFinale() {
-  if (!utilisateurASupprimer) {
-    return;
-  }
+  async function handleConfirmationFinale() {
+    if (!utilisateurASupprimer) {
+      return;
+    }
 
-  try {
-    setDeleting(true);
+    try {
+      setDeleting(true);
 
-    const resultat =
-      await deleteUserAdmin(
-        utilisateurASupprimer.id
+      const resultat =
+        await deleteUserAdmin(
+          utilisateurASupprimer.id
+        );
+
+      setShowConfirmationSuppression(false);
+      setUtilisateurASupprimer(null);
+
+      window.alert(
+        resultat.message
       );
 
-    setShowConfirmationSuppression(false);
-    setUtilisateurASupprimer(null);
+      await chargerUtilisateurs(
+        page,
+        recherche,
+        roleFiltre
+      );
+    } catch (err: unknown) {
+      console.error(
+        "Erreur suppression utilisateur :",
+        err
+      );
 
-    window.alert(
-      resultat.message
-    );
-
-    await chargerUtilisateurs(
-      page,
-      recherche,
-      roleFiltre
-    );
-  } catch (err: unknown) {
-    console.error(
-      "Erreur suppression utilisateur :",
-      err
-    );
-
-    if (axios.isAxiosError(err)) {
-      window.alert(
-        err.response?.data?.message ??
+      if (axios.isAxiosError(err)) {
+        window.alert(
+          err.response?.data?.message ??
+            "Impossible de supprimer cet utilisateur."
+        );
+      } else {
+        window.alert(
           "Impossible de supprimer cet utilisateur."
-      );
-    } else {
-      window.alert(
-        "Impossible de supprimer cet utilisateur."
-      );
-    }
-  } finally {
-    setDeleting(false);
-  }
-}
-  // =====================================================
-  // FORMAT DATE
-  // =====================================================
-
-  function formatDate(
-    date: string
-  ) {
-    return new Intl.DateTimeFormat(
-      "fr-FR",
-      {
-        dateStyle: "medium",
+        );
       }
-    ).format(
-      new Date(date)
-    );
-  }
-
-  // =====================================================
-  // LIBELLÉ RÔLE
-  // =====================================================
-
-  function roleLabel(
-    role: UserRole
-  ) {
-    switch (role) {
-      case "ADMIN":
-        return "Administrateur";
-
-      case "FORMATEUR":
-        return "Formateur";
-
-      case "APPRENANT":
-        return "Apprenant";
-
-      default:
-        return role;
-    }
-  }
-
-  // =====================================================
-  // COULEUR RÔLE
-  // =====================================================
-
-  function roleClass(
-    role: UserRole
-  ) {
-    switch (role) {
-      case "ADMIN":
-        return "bg-violet-100 text-violet-700";
-
-      case "FORMATEUR":
-        return "bg-cyan-100 text-cyan-700";
-
-      case "APPRENANT":
-        return "bg-emerald-100 text-emerald-700";
-
-      default:
-        return "bg-slate-100 text-slate-700";
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -611,141 +557,142 @@ async function handleConfirmationFinale() {
               ou formateur.
             </p>
 
-          <form onSubmit={handleCreerUtilisateur} noValidate className="mt-6">
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Nom</label>
-                <input
-                  type="text"
-                  value={nom}
-                  onChange={(e) => {
-                    setNom(onlyLetters(e.target.value));
-                    effacerErreur("nom");
-                  }}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                />
-                {erreurs.nom && <p className="mt-1 text-sm text-red-600">{erreurs.nom}</p>}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Prénom</label>
-                <input
-                  type="text"
-                  value={prenom}
-                  onChange={(e) => {
-                    setPrenom(onlyLetters(e.target.value));
-                    effacerErreur("prenom");
-                  }}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                />
-                {erreurs.prenom && <p className="mt-1 text-sm text-red-600">{erreurs.prenom}</p>}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(onlyEmailChars(e.target.value));
-                    effacerErreur("email");
-                  }}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                />
-                {erreurs.email && <p className="mt-1 text-sm text-red-600">{erreurs.email}</p>}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Téléphone</label>
-                <input
-                  type="tel"
-                  value={telephone}
-                  onChange={(e) => {
-                    setTelephone(onlyPhone(e.target.value));
-                    effacerErreur("telephone");
-                  }}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                />
-                {erreurs.telephone && <p className="mt-1 text-sm text-red-600">{erreurs.telephone}</p>}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Adresse</label>
-                <input
-                  type="text"
-                  value={adresse}
-                  onChange={(e) => {
-                    setAdresse(e.target.value);
-                    effacerErreur("adresse");
-                  }}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
-                />
-                {erreurs.adresse && <p className="mt-1 text-sm text-red-600">{erreurs.adresse}</p>}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">Rôle</label>
-                <select
-                  value={roleCreation}
-                  onChange={(e) => setRoleCreation(e.target.value as "ADMIN" | "FORMATEUR")}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
-                >
-                  <option value="FORMATEUR">Formateur</option>
-                  <option value="ADMIN">Administrateur</option>
-                </select>
-              </div>
-            </div>
-                <div className="mt-5">
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Mot de passe</label>
-
-                  <div className="relative">
-                    <input
-                      type={afficherMdp ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        effacerErreur("password");
-                      }}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-cyan-600"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => setAfficherMdp(!afficherMdp)}
-                      aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
-                      className="absolute inset-y-0 right-0 flex items-center px-4
-                                text-slate-400 hover:text-slate-600"
-                    >
-                      {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-
-                  {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
+            <form onSubmit={handleCreerUtilisateur} noValidate className="mt-6">
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Nom</label>
+                  <input
+                    type="text"
+                    value={nom}
+                    onChange={(e) => {
+                      setNom(onlyLetters(e.target.value));
+                      effacerErreur("nom");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+                  {erreurs.nom && <p className="mt-1 text-sm text-red-600">{erreurs.nom}</p>}
                 </div>
 
-            {createError && <p className="mt-4 text-sm text-red-600">{createError}</p>}
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Prénom</label>
+                  <input
+                    type="text"
+                    value={prenom}
+                    onChange={(e) => {
+                      setPrenom(onlyLetters(e.target.value));
+                      effacerErreur("prenom");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+                  {erreurs.prenom && <p className="mt-1 text-sm text-red-600">{erreurs.prenom}</p>}
+                </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  resetCreation();
-                  setShowCreateForm(false);
-                }}
-                className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Annuler
-              </button>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(onlyEmailChars(e.target.value));
+                      effacerErreur("email");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+                  {erreurs.email && <p className="mt-1 text-sm text-red-600">{erreurs.email}</p>}
+                </div>
 
-              <button
-                type="submit"
-                disabled={creating}
-                className="rounded-xl bg-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {creating ? "Création..." : "Créer"}
-              </button>
-            </div>
-          </form>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Téléphone</label>
+                  <input
+                    type="tel"
+                    value={telephone}
+                    onChange={(e) => {
+                      setTelephone(onlyPhone(e.target.value));
+                      effacerErreur("telephone");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+                  {erreurs.telephone && <p className="mt-1 text-sm text-red-600">{erreurs.telephone}</p>}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Adresse</label>
+                  <input
+                    type="text"
+                    value={adresse}
+                    onChange={(e) => {
+                      setAdresse(e.target.value);
+                      effacerErreur("adresse");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-cyan-600"
+                  />
+                  {erreurs.adresse && <p className="mt-1 text-sm text-red-600">{erreurs.adresse}</p>}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Rôle</label>
+                  <select
+                    value={roleCreation}
+                    onChange={(e) => setRoleCreation(e.target.value as "ADMIN" | "FORMATEUR")}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-cyan-600"
+                  >
+                    <option value="FORMATEUR">Formateur</option>
+                    <option value="ADMIN">Administrateur</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Mot de passe</label>
+
+                <div className="relative">
+                  <input
+                    type={afficherMdp ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      effacerErreur("password");
+                    }}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-cyan-600"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setAfficherMdp(!afficherMdp)}
+                    aria-label={afficherMdp ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                    className="absolute inset-y-0 right-0 flex items-center px-4
+                              text-slate-400 hover:text-slate-600"
+                  >
+                    {afficherMdp ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+
+                {erreurs.password && <p className="mt-1 text-sm text-red-600">{erreurs.password}</p>}
+              </div>
+
+              {createError && <p className="mt-4 text-sm text-red-600">{createError}</p>}
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetCreation();
+                    setShowCreateForm(false);
+                  }}
+                  className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="rounded-xl bg-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {creating ? "Création..." : "Créer"}
+                </button>
+              </div>
+            </form>
           </section>
         )}
 
@@ -755,9 +702,7 @@ async function handleConfirmationFinale() {
 
         <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <form
-            onSubmit={
-              handleRecherche
-            }
+            onSubmit={handleRecherche}
             className="grid gap-4 lg:grid-cols-[1fr_220px_auto]"
           >
             <div>
@@ -911,38 +856,26 @@ async function handleConfirmationFinale() {
                   {utilisateurs.map(
                     (utilisateur) => (
                       <tr
-                        key={
-                          utilisateur.id
-                        }
+                        key={utilisateur.id}
                         className="transition hover:bg-slate-50"
                       >
                         <td className="whitespace-nowrap px-5 py-4">
                           <p className="font-semibold text-slate-900">
-                            {
-                              utilisateur.prenom
-                            }{" "}
-                            {
-                              utilisateur.nom
-                            }
+                            {utilisateur.prenom}{" "}
+                            {utilisateur.nom}
                           </p>
                         </td>
 
                         <td className="px-5 py-4 text-sm text-slate-600">
-                          {
-                            utilisateur.email
-                          }
+                          {utilisateur.email}
                         </td>
 
                         <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
-                          {
-                            utilisateur.telephone
-                          }
+                          {utilisateur.telephone}
                         </td>
 
                         <td className="px-5 py-4 text-sm text-slate-600">
-                          {
-                            utilisateur.adresse
-                          }
+                          {utilisateur.adresse}
                         </td>
 
                         <td className="whitespace-nowrap px-5 py-4">
@@ -989,403 +922,50 @@ async function handleConfirmationFinale() {
             PAGINATION
         ================================================= */}
 
-        {!loading &&
-          totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-between gap-4">
-              <button
-                type="button"
-                disabled={
-                  page <= 1
-                }
-                onClick={() =>
-                  void chargerUtilisateurs(
-                    page - 1,
-                    recherche,
-                    roleFiltre
-                  )
-                }
-                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                ← Précédent
-              </button>
-
-              <p className="text-sm text-slate-500">
-                Page {page} sur{" "}
-                {totalPages}
-              </p>
-
-              <button
-                type="button"
-                disabled={
-                  page >=
-                  totalPages
-                }
-                onClick={() =>
-                  void chargerUtilisateurs(
-                    page + 1,
-                    recherche,
-                    roleFiltre
-                  )
-                }
-                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Suivant →
-              </button>
-            </div>
-          )}
+        {!loading && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(nouvellePage) =>
+              void chargerUtilisateurs(
+                nouvellePage,
+                recherche,
+                roleFiltre
+              )
+            }
+          />
+        )}
 
         {/* =================================================
-            MODAL 1 - AVERTISSEMENT
+            FENÊTRES DE SUPPRESSION
         ================================================= */}
 
-        {showWarningSuppression &&
-          utilisateurASupprimer && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-              <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-xl font-bold text-amber-700">
-                  !
-                </div>
-
-                <h2 className="mt-4 text-xl font-bold text-slate-900">
-                  Vérification recommandée
-                </h2>
-
-                <p className="mt-4 text-sm leading-6 text-slate-600">
-                  Cet utilisateur peut être
-                  toujours en activité sur la
-                  plateforme.
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Vérifiez ses données et ses
-                  éventuelles activités avant de
-                  continuer la suppression.
-                </p>
-
-                <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="font-semibold text-slate-900">
-                    {
-                      utilisateurASupprimer.prenom
-                    }{" "}
-                    {
-                      utilisateurASupprimer.nom
-                    }
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    {
-                      utilisateurASupprimer.email
-                    }
-                  </p>
-
-                  <span
-                    className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${roleClass(
-                      utilisateurASupprimer.role
-                    )}`}
-                  >
-                    {roleLabel(
-                      utilisateurASupprimer.role
-                    )}
-                  </span>
-                </div>
-
-                <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                  <button
-                    type="button"
-                    onClick={
-                      handleAnnulerSuppression
-                    }
-                    className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Annuler
-                  </button>
-
-                <button
-                    type="button"
-                    onClick={handleVerifierUtilisateur}
-                    disabled={loadingVerification}
-                    className="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-2.5 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                    {loadingVerification
-                        ? "Vérification..."
-                        : "Vérifier"}
-                </button>
-
-                  <button
-                    type="button"
-                    onClick={
-                      handleContinuerSuppression
-                    }
-                    className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                  >
-                    Continuer
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-{showVerificationDetails &&
-  verificationData &&
-  utilisateurASupprimer && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-        <h2 className="text-xl font-bold text-slate-900">
-          Vérification des données
-        </h2>
-
-        <p className="mt-2 text-sm text-slate-500">
-          {verificationData.user.prenom}{" "}
-          {verificationData.user.nom}
-        </p>
-
-        {isDeleteCheckApprenant(verificationData) && (
-          <div className="mt-6 space-y-5">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Inscriptions
-                </p>
-                <p className="mt-1 text-xl font-bold text-slate-900">
-                  {
-                    verificationData.dependances
-                      .inscriptions
-                  }
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Présences
-                </p>
-                <p className="mt-1 text-xl font-bold text-slate-900">
-                  {
-                    verificationData.dependances
-                      .presences
-                  }
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Progressions
-                </p>
-                <p className="mt-1 text-xl font-bold text-slate-900">
-                  {
-                    verificationData.dependances
-                      .progressions
-                  }
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">
-                  Soumissions
-                </p>
-                <p className="mt-1 text-xl font-bold text-slate-900">
-                  {
-                    verificationData.dependances
-                      .soumissions
-                  }
-                </p>
-              </div>
-            </div>
-
-            {verificationData.details.inscriptions.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-slate-900">
-                  Formations concernées
-                </h3>
-
-                <div className="mt-3 space-y-2">
-                  {verificationData.details.inscriptions.map(
-                    (inscription) => (
-                      <div
-                        key={inscription.id}
-                        className="rounded-xl border border-slate-200 p-4"
-                      >
-                        <p className="font-medium text-slate-900">
-                          {
-                            inscription.formation
-                              .titre
-                          }
-                        </p>
-
-                        <p className="mt-1 text-sm text-slate-500">
-                          Statut :{" "}
-                          {inscription.statut}
-                        </p>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+        {showWarningSuppression && utilisateurASupprimer && (
+          <DeleteWarningModal
+            utilisateur={utilisateurASupprimer}
+            loadingVerification={loadingVerification}
+            onCancel={handleAnnulerSuppression}
+            onVerify={handleVerifierUtilisateur}
+            onContinue={handleContinuerSuppression}
+          />
         )}
 
-       {isDeleteCheckFormateur(verificationData) && (
-          <div className="mt-6">
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">
-                Affectations
-              </p>
-
-              <p className="mt-1 text-2xl font-bold text-slate-900">
-                {
-                  verificationData.dependances
-                    .affectations
-                }
-              </p>
-            </div>
-
-            {verificationData.details.affectations.length > 0 && (
-              <div className="mt-5">
-                <h3 className="font-semibold text-slate-900">
-                  Formations affectées
-                </h3>
-
-                <div className="mt-3 space-y-2">
-                  {verificationData.details.affectations.map(
-                    (affectation) => (
-                      <div
-                        key={affectation.id}
-                        className="rounded-xl border border-slate-200 p-4"
-                      >
-                        <p className="font-medium text-slate-900">
-                          {
-                            affectation.formation
-                              .titre
-                          }
-                        </p>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+        {showVerificationDetails && verificationData && utilisateurASupprimer && (
+          <DeleteVerificationModal
+            data={verificationData}
+            onClose={handleFermerVerification}
+            onContinue={handleContinuerApresVerification}
+          />
         )}
 
-        {isDeleteCheckAdmin(verificationData) && (
-          <div className="mt-6">
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">
-                Formations créées
-              </p>
-
-              <p className="mt-1 text-2xl font-bold text-slate-900">
-                {
-                  verificationData.dependances
-                    .formationsCreees
-                }
-              </p>
-            </div>
-
-            {verificationData.raison && (
-              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                {verificationData.raison}
-              </div>
-            )}
-          </div>
+        {showConfirmationSuppression && utilisateurASupprimer && (
+          <DeleteConfirmModal
+            utilisateur={utilisateurASupprimer}
+            deleting={deleting}
+            onCancel={handleAnnulerSuppression}
+            onConfirm={handleConfirmationFinale}
+          />
         )}
-
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              setShowVerificationDetails(false);
-              setVerificationData(null);
-              setUtilisateurASupprimer(null);
-            }}
-            className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700"
-          >
-            Fermer
-          </button>
-
-          {verificationData.peutSupprimer && (
-            <button
-              type="button"
-              onClick={() => {
-                setShowVerificationDetails(false);
-                setShowConfirmationSuppression(true);
-              }}
-              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-            >
-              Continuer la suppression
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  )}
-
-
-          
-
-        {/* =================================================
-            MODAL 2 - CONFIRMATION FINALE
-        ================================================= */}
-        {showConfirmationSuppression &&
-          utilisateurASupprimer && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-              <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl font-bold text-red-700">
-                  !
-                </div>
-
-                <h2 className="mt-4 text-xl font-bold text-slate-900">
-                  Confirmer la suppression
-                </h2>
-
-                <p className="mt-4 text-sm leading-6 text-slate-600">
-                  Voulez-vous vraiment supprimer
-                  définitivement cet utilisateur ?
-                </p>
-
-                <div className="mt-4 rounded-xl bg-slate-50 p-4">
-                  <p className="font-semibold text-slate-900">
-                    {utilisateurASupprimer.prenom}{" "}
-                    {utilisateurASupprimer.nom}
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    {utilisateurASupprimer.email}
-                  </p>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
-                  <p className="text-sm font-medium text-red-700">
-                    Cette action sera définitive
-                    et irréversible.
-                  </p>
-                </div>
-
-                <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                  <button
-                    type="button"
-                    disabled={deleting}
-                    onClick={handleAnnulerSuppression}
-                    className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Annuler
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={deleting}
-                    onClick={handleConfirmationFinale}
-                    className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {deleting
-                      ? "Suppression..."
-                      : "Confirmer la suppression"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
       </div>
     </div>
   );

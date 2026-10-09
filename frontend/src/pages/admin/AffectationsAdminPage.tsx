@@ -3,21 +3,15 @@ import {
   useState,
   type FormEvent,
 } from "react";
-
 import axios from "axios";
-
 import {
   createAffectationAdmin,
   deleteAffectationAdmin,
   getAffectationsAdmin,
   type AffectationAdmin,
 } from "../../services/affectation.service";
-
-import {
-  getUsersAdmin,
-  type UserAdmin,
-} from "../../services/user.service";
-
+import { getUsersAdmin } from "../../services/user.service";
+import type { UserAdmin } from "../../types/user.types";
 import {
   getFormations,
   type Formation,
