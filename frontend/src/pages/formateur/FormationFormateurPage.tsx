@@ -3,9 +3,8 @@ import { Link, useParams } from "react-router-dom";
 
 import {
   getCoursFormation,
-  type CoursFormation,
 } from "../../services/cours.service";
-
+import type { CoursFormation } from "../../types/cours.types";
 function FormationFormateurPage() {
   const { id } = useParams();
 

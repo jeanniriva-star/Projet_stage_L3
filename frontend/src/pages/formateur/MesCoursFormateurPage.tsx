@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 import {
   getMesCoursFormateur,
-  type CoursFormateur,
 } from "../../services/cours.service";
+import type { CoursFormateur } from "../../types/cours.types";
 
 function MesCoursFormateurPage() {
   const [cours, setCours] = useState<CoursFormateur[]>([]);
