@@ -21,6 +21,7 @@ export interface InscriptionResponse {
       id: string;
       titre: string;
       description: string | null;
+      prix: string;
     };
   };
 }

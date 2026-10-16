@@ -1,31 +1,62 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import PaiementModal from "../../components/apprenant/PaiementModal";
 import {
   getMesFormations,
   type InscriptionApprenant,
 } from "../../services/apprenant.service";
+import { formatPrix } from "../../utils/format";
+
+type FormationPaiement = {
+  id: string;
+  titre: string;
+  prix: string;
+};
 
 function MesFormationsPage() {
   const [inscriptions, setInscriptions] = useState<InscriptionApprenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [formationAPayer, setFormationAPayer] =
+    useState<FormationPaiement | null>(null);
+
+  // Incrémenté après un paiement pour recharger la liste
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
+    let annule = false;
+
     async function chargerFormations() {
       try {
         const data = await getMesFormations();
+
+        if (annule) {
+          return;
+        }
+
         setInscriptions(data);
+        setError("");
       } catch (err) {
+        if (annule) {
+          return;
+        }
+
         console.error(err);
         setError("Impossible de charger vos formations.");
       } finally {
-        setLoading(false);
+        if (!annule) {
+          setLoading(false);
+        }
       }
     }
 
     chargerFormations();
-  }, []);
+
+    return () => {
+      annule = true;
+    };
+  }, [version]);
 
   return (
     <div className="px-6 py-8">
@@ -124,9 +155,27 @@ function MesFormationsPage() {
                       Accéder à la formation
                     </Link>
                   ) : inscription.statut === "EN_ATTENTE" ? (
-                    <p className="text-sm text-slate-600">
-                      Votre demande est en attente de validation.
-                    </p>
+                    <div className="space-y-3">
+                      <p className="text-sm text-slate-600">
+                        Votre demande est en attente de validation.
+                      </p>
+
+                      {Number(inscription.formation.prix) > 0 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormationAPayer({
+                              id: inscription.formation.id,
+                              titre: inscription.formation.titre,
+                              prix: inscription.formation.prix,
+                            })
+                          }
+                          className="block w-full rounded-xl bg-cyan-700 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-800"
+                        >
+                          Payer {formatPrix(inscription.formation.prix)}
+                        </button>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-sm text-slate-600">
                       Cette inscription n'a pas été validée.
@@ -138,6 +187,14 @@ function MesFormationsPage() {
           </div>
         )}
       </div>
+
+      {formationAPayer && (
+        <PaiementModal
+          formation={formationAPayer}
+          onFermer={() => setFormationAPayer(null)}
+          onTermine={() => setVersion((v) => v + 1)}
+        />
+      )}
     </div>
   );
 }

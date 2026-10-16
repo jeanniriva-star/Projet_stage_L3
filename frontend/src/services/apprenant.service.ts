@@ -8,6 +8,7 @@ export interface InscriptionApprenant {
     id: string;
     titre: string;
     description: string | null;
+    prix: string;
   };
 }
 

@@ -1,6 +1,28 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import PaiementModal from "../../components/apprenant/PaiementModal";
+import { formatPrix } from "../../utils/format";
+
+type FormationPaiement = {
+  id: string;
+  titre: string;
+  prix: string;
+};
 
 function InscriptionPendingPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // La formation est transmise par la page qui a envoyé l'inscription
+  const formation = (
+    location.state as { formation?: FormationPaiement } | null
+  )?.formation;
+
+  const [showPaiement, setShowPaiement] = useState(false);
+
+  const peutPayer = formation !== undefined && Number(formation.prix) > 0;
+
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-12">
       <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -13,13 +35,36 @@ function InscriptionPendingPage() {
         </h1>
 
         <p className="mt-4 leading-7 text-slate-600">
-          Votre demande a bien été enregistrée. Elle doit maintenant être
-          validée par l'administrateur du centre.
+          Votre demande a bien été enregistrée.
+          {peutPayer
+            ? " Payez maintenant pour valider immédiatement votre inscription."
+            : " Elle doit maintenant être validée par l'administrateur du centre."}
         </p>
 
-        <div className="mt-6 rounded-xl bg-cyan-50 p-5">
+        {peutPayer && formation && (
+          <div className="mt-6 rounded-xl border border-cyan-200 bg-cyan-50 p-5">
+            <h2 className="font-bold text-slate-900">Payer maintenant</h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Réglez votre formation par Mobile Money : votre inscription sera
+              validée dès que le paiement est confirmé.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowPaiement(true)}
+              className="mt-4 rounded-xl bg-cyan-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800"
+            >
+              Payer {formatPrix(formation.prix)}
+            </button>
+          </div>
+        )}
+
+        <div className="mt-6 rounded-xl bg-slate-50 p-5">
           <h2 className="font-bold text-slate-900">
-            Finaliser votre inscription
+            {peutPayer
+              ? "Vous préférez payer au centre ?"
+              : "Finaliser votre inscription"}
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-slate-700">
@@ -59,6 +104,14 @@ function InscriptionPendingPage() {
           Aller à mon espace
         </Link>
       </div>
+
+      {showPaiement && formation && (
+        <PaiementModal
+          formation={formation}
+          onFermer={() => setShowPaiement(false)}
+          onTermine={() => navigate("/apprenant")}
+        />
+      )}
     </div>
   );
 }

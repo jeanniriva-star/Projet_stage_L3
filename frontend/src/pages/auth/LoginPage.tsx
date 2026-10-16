@@ -39,10 +39,15 @@ function LoginPage() {
      loginUser(data.token, data.user);
      if (formationId && data.user.role === "APPRENANT") {
   try {
-    await inscrireFormation(formationId);
+       const resultat = await inscrireFormation(formationId);
 
     navigate(
-      `/inscription-en-attente?formationId=${formationId}`
+      `/inscription-en-attente?formationId=${formationId}`,
+      {
+        state: {
+          formation: resultat.inscription.formation,
+        },
+      }
     );
 
     return;
