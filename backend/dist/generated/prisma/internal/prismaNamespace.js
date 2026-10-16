@@ -82,7 +82,8 @@ export const ModelName = {
     Question: 'Question',
     Choix: 'Choix',
     SoumissionEvaluation: 'SoumissionEvaluation',
-    ReponseQCM: 'ReponseQCM'
+    ReponseQCM: 'ReponseQCM',
+    Paiement: 'Paiement'
 };
 /**
  * Enums
@@ -212,6 +213,23 @@ export const ReponseQCMScalarFieldEnum = {
     soumissionId: 'soumissionId',
     questionId: 'questionId',
     choixId: 'choixId'
+};
+export const PaiementScalarFieldEnum = {
+    id: 'id',
+    reference: 'reference',
+    cleIdempotence: 'cleIdempotence',
+    inscriptionId: 'inscriptionId',
+    montant: 'montant',
+    devise: 'devise',
+    methode: 'methode',
+    telephone: 'telephone',
+    statut: 'statut',
+    transactionId: 'transactionId',
+    motifEchec: 'motifEchec',
+    expireAt: 'expireAt',
+    confirmeAt: 'confirmeAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 export const SortOrder = {
     asc: 'asc',

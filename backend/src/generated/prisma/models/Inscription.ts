@@ -187,6 +187,7 @@ export type InscriptionWhereInput = {
   presences?: Prisma.PresenceListRelationFilter
   progressions?: Prisma.ProgressionCoursListRelationFilter
   soumissions?: Prisma.SoumissionEvaluationListRelationFilter
+  paiements?: Prisma.PaiementListRelationFilter
 }
 
 export type InscriptionOrderByWithRelationInput = {
@@ -200,6 +201,7 @@ export type InscriptionOrderByWithRelationInput = {
   presences?: Prisma.PresenceOrderByRelationAggregateInput
   progressions?: Prisma.ProgressionCoursOrderByRelationAggregateInput
   soumissions?: Prisma.SoumissionEvaluationOrderByRelationAggregateInput
+  paiements?: Prisma.PaiementOrderByRelationAggregateInput
 }
 
 export type InscriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -217,6 +219,7 @@ export type InscriptionWhereUniqueInput = Prisma.AtLeast<{
   presences?: Prisma.PresenceListRelationFilter
   progressions?: Prisma.ProgressionCoursListRelationFilter
   soumissions?: Prisma.SoumissionEvaluationListRelationFilter
+  paiements?: Prisma.PaiementListRelationFilter
 }, "id" | "apprenantId_formationId">
 
 export type InscriptionOrderByWithAggregationInput = {
@@ -250,6 +253,7 @@ export type InscriptionCreateInput = {
   presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateInput = {
@@ -261,6 +265,7 @@ export type InscriptionUncheckedCreateInput = {
   presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUpdateInput = {
@@ -272,6 +277,7 @@ export type InscriptionUpdateInput = {
   presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateInput = {
@@ -283,6 +289,7 @@ export type InscriptionUncheckedUpdateInput = {
   presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionCreateManyInput = {
@@ -481,6 +488,20 @@ export type InscriptionUpdateOneRequiredWithoutSoumissionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InscriptionUpdateToOneWithWhereWithoutSoumissionsInput, Prisma.InscriptionUpdateWithoutSoumissionsInput>, Prisma.InscriptionUncheckedUpdateWithoutSoumissionsInput>
 }
 
+export type InscriptionCreateNestedOneWithoutPaiementsInput = {
+  create?: Prisma.XOR<Prisma.InscriptionCreateWithoutPaiementsInput, Prisma.InscriptionUncheckedCreateWithoutPaiementsInput>
+  connectOrCreate?: Prisma.InscriptionCreateOrConnectWithoutPaiementsInput
+  connect?: Prisma.InscriptionWhereUniqueInput
+}
+
+export type InscriptionUpdateOneRequiredWithoutPaiementsNestedInput = {
+  create?: Prisma.XOR<Prisma.InscriptionCreateWithoutPaiementsInput, Prisma.InscriptionUncheckedCreateWithoutPaiementsInput>
+  connectOrCreate?: Prisma.InscriptionCreateOrConnectWithoutPaiementsInput
+  upsert?: Prisma.InscriptionUpsertWithoutPaiementsInput
+  connect?: Prisma.InscriptionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InscriptionUpdateToOneWithWhereWithoutPaiementsInput, Prisma.InscriptionUpdateWithoutPaiementsInput>, Prisma.InscriptionUncheckedUpdateWithoutPaiementsInput>
+}
+
 export type InscriptionCreateWithoutApprenantInput = {
   id?: string
   statut?: $Enums.StatutInscription
@@ -489,6 +510,7 @@ export type InscriptionCreateWithoutApprenantInput = {
   presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateWithoutApprenantInput = {
@@ -499,6 +521,7 @@ export type InscriptionUncheckedCreateWithoutApprenantInput = {
   presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionCreateOrConnectWithoutApprenantInput = {
@@ -546,6 +569,7 @@ export type InscriptionCreateWithoutFormationInput = {
   presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateWithoutFormationInput = {
@@ -556,6 +580,7 @@ export type InscriptionUncheckedCreateWithoutFormationInput = {
   presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionCreateOrConnectWithoutFormationInput = {
@@ -592,6 +617,7 @@ export type InscriptionCreateWithoutPresencesInput = {
   formation: Prisma.FormationCreateNestedOneWithoutInscriptionsInput
   progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateWithoutPresencesInput = {
@@ -602,6 +628,7 @@ export type InscriptionUncheckedCreateWithoutPresencesInput = {
   dateInscription?: Date | string
   progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionCreateOrConnectWithoutPresencesInput = {
@@ -628,6 +655,7 @@ export type InscriptionUpdateWithoutPresencesInput = {
   formation?: Prisma.FormationUpdateOneRequiredWithoutInscriptionsNestedInput
   progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateWithoutPresencesInput = {
@@ -638,6 +666,7 @@ export type InscriptionUncheckedUpdateWithoutPresencesInput = {
   dateInscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionCreateWithoutProgressionsInput = {
@@ -648,6 +677,7 @@ export type InscriptionCreateWithoutProgressionsInput = {
   formation: Prisma.FormationCreateNestedOneWithoutInscriptionsInput
   presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateWithoutProgressionsInput = {
@@ -658,6 +688,7 @@ export type InscriptionUncheckedCreateWithoutProgressionsInput = {
   dateInscription?: Date | string
   presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionCreateOrConnectWithoutProgressionsInput = {
@@ -684,6 +715,7 @@ export type InscriptionUpdateWithoutProgressionsInput = {
   formation?: Prisma.FormationUpdateOneRequiredWithoutInscriptionsNestedInput
   presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateWithoutProgressionsInput = {
@@ -694,6 +726,7 @@ export type InscriptionUncheckedUpdateWithoutProgressionsInput = {
   dateInscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionCreateWithoutSoumissionsInput = {
@@ -704,6 +737,7 @@ export type InscriptionCreateWithoutSoumissionsInput = {
   formation: Prisma.FormationCreateNestedOneWithoutInscriptionsInput
   presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionUncheckedCreateWithoutSoumissionsInput = {
@@ -714,6 +748,7 @@ export type InscriptionUncheckedCreateWithoutSoumissionsInput = {
   dateInscription?: Date | string
   presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
   progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
+  paiements?: Prisma.PaiementUncheckedCreateNestedManyWithoutInscriptionInput
 }
 
 export type InscriptionCreateOrConnectWithoutSoumissionsInput = {
@@ -740,6 +775,7 @@ export type InscriptionUpdateWithoutSoumissionsInput = {
   formation?: Prisma.FormationUpdateOneRequiredWithoutInscriptionsNestedInput
   presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateWithoutSoumissionsInput = {
@@ -750,6 +786,67 @@ export type InscriptionUncheckedUpdateWithoutSoumissionsInput = {
   dateInscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
+}
+
+export type InscriptionCreateWithoutPaiementsInput = {
+  id?: string
+  statut?: $Enums.StatutInscription
+  dateInscription?: Date | string
+  apprenant: Prisma.UserCreateNestedOneWithoutInscriptionsInput
+  formation: Prisma.FormationCreateNestedOneWithoutInscriptionsInput
+  presences?: Prisma.PresenceCreateNestedManyWithoutInscriptionInput
+  progressions?: Prisma.ProgressionCoursCreateNestedManyWithoutInscriptionInput
+  soumissions?: Prisma.SoumissionEvaluationCreateNestedManyWithoutInscriptionInput
+}
+
+export type InscriptionUncheckedCreateWithoutPaiementsInput = {
+  id?: string
+  apprenantId: string
+  formationId: string
+  statut?: $Enums.StatutInscription
+  dateInscription?: Date | string
+  presences?: Prisma.PresenceUncheckedCreateNestedManyWithoutInscriptionInput
+  progressions?: Prisma.ProgressionCoursUncheckedCreateNestedManyWithoutInscriptionInput
+  soumissions?: Prisma.SoumissionEvaluationUncheckedCreateNestedManyWithoutInscriptionInput
+}
+
+export type InscriptionCreateOrConnectWithoutPaiementsInput = {
+  where: Prisma.InscriptionWhereUniqueInput
+  create: Prisma.XOR<Prisma.InscriptionCreateWithoutPaiementsInput, Prisma.InscriptionUncheckedCreateWithoutPaiementsInput>
+}
+
+export type InscriptionUpsertWithoutPaiementsInput = {
+  update: Prisma.XOR<Prisma.InscriptionUpdateWithoutPaiementsInput, Prisma.InscriptionUncheckedUpdateWithoutPaiementsInput>
+  create: Prisma.XOR<Prisma.InscriptionCreateWithoutPaiementsInput, Prisma.InscriptionUncheckedCreateWithoutPaiementsInput>
+  where?: Prisma.InscriptionWhereInput
+}
+
+export type InscriptionUpdateToOneWithWhereWithoutPaiementsInput = {
+  where?: Prisma.InscriptionWhereInput
+  data: Prisma.XOR<Prisma.InscriptionUpdateWithoutPaiementsInput, Prisma.InscriptionUncheckedUpdateWithoutPaiementsInput>
+}
+
+export type InscriptionUpdateWithoutPaiementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  statut?: Prisma.EnumStatutInscriptionFieldUpdateOperationsInput | $Enums.StatutInscription
+  dateInscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apprenant?: Prisma.UserUpdateOneRequiredWithoutInscriptionsNestedInput
+  formation?: Prisma.FormationUpdateOneRequiredWithoutInscriptionsNestedInput
+  presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
+  progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
+  soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+}
+
+export type InscriptionUncheckedUpdateWithoutPaiementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  apprenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  formationId?: Prisma.StringFieldUpdateOperationsInput | string
+  statut?: Prisma.EnumStatutInscriptionFieldUpdateOperationsInput | $Enums.StatutInscription
+  dateInscription?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
+  progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
+  soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionCreateManyApprenantInput = {
@@ -767,6 +864,7 @@ export type InscriptionUpdateWithoutApprenantInput = {
   presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateWithoutApprenantInput = {
@@ -777,6 +875,7 @@ export type InscriptionUncheckedUpdateWithoutApprenantInput = {
   presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateManyWithoutApprenantInput = {
@@ -801,6 +900,7 @@ export type InscriptionUpdateWithoutFormationInput = {
   presences?: Prisma.PresenceUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateWithoutFormationInput = {
@@ -811,6 +911,7 @@ export type InscriptionUncheckedUpdateWithoutFormationInput = {
   presences?: Prisma.PresenceUncheckedUpdateManyWithoutInscriptionNestedInput
   progressions?: Prisma.ProgressionCoursUncheckedUpdateManyWithoutInscriptionNestedInput
   soumissions?: Prisma.SoumissionEvaluationUncheckedUpdateManyWithoutInscriptionNestedInput
+  paiements?: Prisma.PaiementUncheckedUpdateManyWithoutInscriptionNestedInput
 }
 
 export type InscriptionUncheckedUpdateManyWithoutFormationInput = {
@@ -829,12 +930,14 @@ export type InscriptionCountOutputType = {
   presences: number
   progressions: number
   soumissions: number
+  paiements: number
 }
 
 export type InscriptionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   presences?: boolean | InscriptionCountOutputTypeCountPresencesArgs
   progressions?: boolean | InscriptionCountOutputTypeCountProgressionsArgs
   soumissions?: boolean | InscriptionCountOutputTypeCountSoumissionsArgs
+  paiements?: boolean | InscriptionCountOutputTypeCountPaiementsArgs
 }
 
 /**
@@ -868,6 +971,13 @@ export type InscriptionCountOutputTypeCountSoumissionsArgs<ExtArgs extends runti
   where?: Prisma.SoumissionEvaluationWhereInput
 }
 
+/**
+ * InscriptionCountOutputType without action
+ */
+export type InscriptionCountOutputTypeCountPaiementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaiementWhereInput
+}
+
 
 export type InscriptionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -880,6 +990,7 @@ export type InscriptionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   presences?: boolean | Prisma.Inscription$presencesArgs<ExtArgs>
   progressions?: boolean | Prisma.Inscription$progressionsArgs<ExtArgs>
   soumissions?: boolean | Prisma.Inscription$soumissionsArgs<ExtArgs>
+  paiements?: boolean | Prisma.Inscription$paiementsArgs<ExtArgs>
   _count?: boolean | Prisma.InscriptionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inscription"]>
 
@@ -918,6 +1029,7 @@ export type InscriptionInclude<ExtArgs extends runtime.Types.Extensions.Internal
   presences?: boolean | Prisma.Inscription$presencesArgs<ExtArgs>
   progressions?: boolean | Prisma.Inscription$progressionsArgs<ExtArgs>
   soumissions?: boolean | Prisma.Inscription$soumissionsArgs<ExtArgs>
+  paiements?: boolean | Prisma.Inscription$paiementsArgs<ExtArgs>
   _count?: boolean | Prisma.InscriptionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InscriptionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -937,6 +1049,7 @@ export type $InscriptionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     presences: Prisma.$PresencePayload<ExtArgs>[]
     progressions: Prisma.$ProgressionCoursPayload<ExtArgs>[]
     soumissions: Prisma.$SoumissionEvaluationPayload<ExtArgs>[]
+    paiements: Prisma.$PaiementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1343,6 +1456,7 @@ export interface Prisma__InscriptionClient<T, Null = never, ExtArgs extends runt
   presences<T extends Prisma.Inscription$presencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inscription$presencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PresencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   progressions<T extends Prisma.Inscription$progressionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inscription$progressionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProgressionCoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   soumissions<T extends Prisma.Inscription$soumissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inscription$soumissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SoumissionEvaluationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  paiements<T extends Prisma.Inscription$paiementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inscription$paiementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaiementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1847,6 +1961,30 @@ export type Inscription$soumissionsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.SoumissionEvaluationScalarFieldEnum | Prisma.SoumissionEvaluationScalarFieldEnum[]
+}
+
+/**
+ * Inscription.paiements
+ */
+export type Inscription$paiementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Paiement
+   */
+  select?: Prisma.PaiementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Paiement
+   */
+  omit?: Prisma.PaiementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaiementInclude<ExtArgs> | null
+  where?: Prisma.PaiementWhereInput
+  orderBy?: Prisma.PaiementOrderByWithRelationInput | Prisma.PaiementOrderByWithRelationInput[]
+  cursor?: Prisma.PaiementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaiementScalarFieldEnum | Prisma.PaiementScalarFieldEnum[]
 }
 
 /**

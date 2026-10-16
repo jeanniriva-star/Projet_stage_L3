@@ -37,4 +37,15 @@ export const NiveauUniversitaire = {
     M1: 'M1',
     M2: 'M2'
 };
+export const MethodePaiement = {
+    MVOLA: 'MVOLA',
+    ORANGE_MONEY: 'ORANGE_MONEY',
+    AIRTEL_MONEY: 'AIRTEL_MONEY'
+};
+export const StatutPaiement = {
+    EN_ATTENTE: 'EN_ATTENTE',
+    REUSSI: 'REUSSI',
+    ECHOUE: 'ECHOUE',
+    ANNULE: 'ANNULE'
+};
 //# sourceMappingURL=enums.js.map

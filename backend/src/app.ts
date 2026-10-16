@@ -12,6 +12,7 @@ import presenceRoutes from "./modules/presences/presence.routes.js";
 import evaluationRoutes from "./modules/evaluations/evaluation.routes.js";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
 import exerciceRoutes from "./modules/exercices/exercice.routes.js";
+import paiementRoutes from "./modules/paiements/paiement.routes.js";
 import path from "path";
 
 const app = express();
@@ -36,6 +37,7 @@ app.use("/api", presenceRoutes);
 app.use("/api", evaluationRoutes);
 app.use("/api", exerciceRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api", paiementRoutes);
 
 
 app.get("/", (req, res) => {

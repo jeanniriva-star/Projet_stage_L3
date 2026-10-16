@@ -116,3 +116,8 @@ export type SoumissionEvaluation = Prisma.SoumissionEvaluationModel
  * 
  */
 export type ReponseQCM = Prisma.ReponseQCMModel
+/**
+ * Model Paiement
+ * 
+ */
+export type Paiement = Prisma.PaiementModel

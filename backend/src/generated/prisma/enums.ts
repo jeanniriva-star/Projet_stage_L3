@@ -61,3 +61,22 @@ export const NiveauUniversitaire = {
 } as const
 
 export type NiveauUniversitaire = (typeof NiveauUniversitaire)[keyof typeof NiveauUniversitaire]
+
+
+export const MethodePaiement = {
+  MVOLA: 'MVOLA',
+  ORANGE_MONEY: 'ORANGE_MONEY',
+  AIRTEL_MONEY: 'AIRTEL_MONEY'
+} as const
+
+export type MethodePaiement = (typeof MethodePaiement)[keyof typeof MethodePaiement]
+
+
+export const StatutPaiement = {
+  EN_ATTENTE: 'EN_ATTENTE',
+  REUSSI: 'REUSSI',
+  ECHOUE: 'ECHOUE',
+  ANNULE: 'ANNULE'
+} as const
+
+export type StatutPaiement = (typeof StatutPaiement)[keyof typeof StatutPaiement]

@@ -65,7 +65,8 @@ export const ModelName = {
   Question: 'Question',
   Choix: 'Choix',
   SoumissionEvaluation: 'SoumissionEvaluation',
-  ReponseQCM: 'ReponseQCM'
+  ReponseQCM: 'ReponseQCM',
+  Paiement: 'Paiement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -262,6 +263,27 @@ export const ReponseQCMScalarFieldEnum = {
 } as const
 
 export type ReponseQCMScalarFieldEnum = (typeof ReponseQCMScalarFieldEnum)[keyof typeof ReponseQCMScalarFieldEnum]
+
+
+export const PaiementScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  cleIdempotence: 'cleIdempotence',
+  inscriptionId: 'inscriptionId',
+  montant: 'montant',
+  devise: 'devise',
+  methode: 'methode',
+  telephone: 'telephone',
+  statut: 'statut',
+  transactionId: 'transactionId',
+  motifEchec: 'motifEchec',
+  expireAt: 'expireAt',
+  confirmeAt: 'confirmeAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaiementScalarFieldEnum = (typeof PaiementScalarFieldEnum)[keyof typeof PaiementScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -411,7 +411,8 @@ export const ModelName = {
   Question: 'Question',
   Choix: 'Choix',
   SoumissionEvaluation: 'SoumissionEvaluation',
-  ReponseQCM: 'ReponseQCM'
+  ReponseQCM: 'ReponseQCM',
+  Paiement: 'Paiement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -427,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "formation" | "affectationFormateur" | "cours" | "exercice" | "ressourcePedagogique" | "session" | "inscription" | "presence" | "progressionCours" | "evaluation" | "question" | "choix" | "soumissionEvaluation" | "reponseQCM"
+    modelProps: "user" | "formation" | "affectationFormateur" | "cours" | "exercice" | "ressourcePedagogique" | "session" | "inscription" | "presence" | "progressionCours" | "evaluation" | "question" | "choix" | "soumissionEvaluation" | "reponseQCM" | "paiement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1541,6 +1542,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Paiement: {
+      payload: Prisma.$PaiementPayload<ExtArgs>
+      fields: Prisma.PaiementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaiementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaiementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        findFirst: {
+          args: Prisma.PaiementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaiementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        findMany: {
+          args: Prisma.PaiementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>[]
+        }
+        create: {
+          args: Prisma.PaiementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        createMany: {
+          args: Prisma.PaiementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaiementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>[]
+        }
+        delete: {
+          args: Prisma.PaiementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        update: {
+          args: Prisma.PaiementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaiementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaiementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaiementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaiementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaiementPayload>
+        }
+        aggregate: {
+          args: Prisma.PaiementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaiement>
+        }
+        groupBy: {
+          args: Prisma.PaiementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaiementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaiementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaiementCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1760,6 +1835,27 @@ export const ReponseQCMScalarFieldEnum = {
 export type ReponseQCMScalarFieldEnum = (typeof ReponseQCMScalarFieldEnum)[keyof typeof ReponseQCMScalarFieldEnum]
 
 
+export const PaiementScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  cleIdempotence: 'cleIdempotence',
+  inscriptionId: 'inscriptionId',
+  montant: 'montant',
+  devise: 'devise',
+  methode: 'methode',
+  telephone: 'telephone',
+  statut: 'statut',
+  transactionId: 'transactionId',
+  motifEchec: 'motifEchec',
+  expireAt: 'expireAt',
+  confirmeAt: 'confirmeAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaiementScalarFieldEnum = (typeof PaiementScalarFieldEnum)[keyof typeof PaiementScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1950,6 +2046,34 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
+
+/**
+ * Reference to a field of type 'MethodePaiement'
+ */
+export type EnumMethodePaiementFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MethodePaiement'>
+    
+
+
+/**
+ * Reference to a field of type 'MethodePaiement[]'
+ */
+export type ListEnumMethodePaiementFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MethodePaiement[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StatutPaiement'
+ */
+export type EnumStatutPaiementFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatutPaiement'>
+    
+
+
+/**
+ * Reference to a field of type 'StatutPaiement[]'
+ */
+export type ListEnumStatutPaiementFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatutPaiement[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2116,6 +2240,7 @@ export type GlobalOmitConfig = {
   choix?: Prisma.ChoixOmit
   soumissionEvaluation?: Prisma.SoumissionEvaluationOmit
   reponseQCM?: Prisma.ReponseQCMOmit
+  paiement?: Prisma.PaiementOmit
 }
 
 /* Types for Logging */

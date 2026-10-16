@@ -38,6 +38,7 @@ export async function createInscription(apprenantId, formationId) {
                     id: true,
                     titre: true,
                     description: true,
+                    prix: true,
                 },
             },
             apprenant: {
@@ -230,6 +231,7 @@ export async function getMesInscriptions(apprenantId) {
                     id: true,
                     titre: true,
                     description: true,
+                    prix: true,
                     _count: {
                         select: {
                             cours: true,
