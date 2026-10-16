@@ -53,6 +53,7 @@ export async function createInscription(
           id: true,
           titre: true,
           description: true,
+          prix: true,
         },
       },
 
@@ -319,6 +320,7 @@ export async function getMesInscriptions(
           id: true,
           titre: true,
           description: true,
+          prix: true,
 
           _count: {
             select: {

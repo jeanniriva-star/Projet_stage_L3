@@ -45,6 +45,19 @@ enum NiveauUniversitaire {
   M1
   M2
 }
+
+enum MethodePaiement {
+  MVOLA
+  ORANGE_MONEY
+  AIRTEL_MONEY
+}
+
+enum StatutPaiement {
+  EN_ATTENTE
+  REUSSI
+  ECHOUE
+  ANNULE
+}
 // ======================================================
 // USER
 // ======================================================
@@ -208,6 +221,7 @@ model Inscription {
   presences    Presence[]
   progressions ProgressionCours[]
   soumissions  SoumissionEvaluation[]
+  paiements    Paiement[]
 
   @@unique([apprenantId, formationId])
 }
@@ -343,4 +357,44 @@ model ReponseQCM {
   choix      Choix                @relation(fields: [choixId], references: [id])
 
   @@unique([soumissionId, questionId])
+}
+
+// ======================================================
+// PAIEMENT (simulé)
+// ======================================================
+
+model Paiement {
+  id String @id @default(uuid())
+
+  // Référence lisible, unique (exemple : PAY-20261016-A1B2C3)
+  reference String @unique
+
+  // Évite de créer deux paiements si l'utilisateur clique deux fois
+  cleIdempotence String? @unique
+
+  inscriptionId String
+  inscription   Inscription @relation(fields: [inscriptionId], references: [id])
+
+  // Le montant est copié depuis le prix de la formation au moment du paiement
+  montant Decimal @db.Decimal(10, 2)
+  devise  String  @default("MGA")
+
+  methode   MethodePaiement
+  telephone String
+
+  statut StatutPaiement @default(EN_ATTENTE)
+
+  // Identifiant de la transaction côté "fournisseur" simulé
+  transactionId String? @unique
+
+  motifEchec String?
+
+  // Le code de confirmation expire après quelques minutes
+  expireAt   DateTime
+  confirmeAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([inscriptionId])
 }
