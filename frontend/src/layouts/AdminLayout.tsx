@@ -37,8 +37,12 @@ function handleLogout() {
             Tableau de bord
         </NavLink>
 
-        <NavLink to="/admin/inscriptions" className={linkClass}>
+         <NavLink to="/admin/inscriptions" className={linkClass}>
             Inscriptions
+        </NavLink>
+
+        <NavLink to="/admin/paiements" className={linkClass}>
+            Paiements
         </NavLink>
 
         <NavLink to="/admin/utilisateurs" className={linkClass}>

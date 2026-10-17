@@ -42,6 +42,7 @@ import FormateurDashboard from "./pages/formateur/FormateurDashboard";
 import MesCoursFormateurPage from "./pages/formateur/MesCoursFormateurPage";
 import SessionsFormateurPage from "./pages/formateur/SessionsFormateurPage";
 import AdminLayout from "./layouts/AdminLayout";
+import PaiementsAdminPage from "./pages/admin/PaiementsAdminPage";
 
 
 function App() {
@@ -86,9 +87,13 @@ function App() {
               path="/admin"
               element={<AdminDashboard />}
             />
-            <Route
+              <Route
               path="/admin/inscriptions"
               element={<InscriptionsAdminPage />}
+             />
+            <Route
+              path="/admin/paiements"
+              element={<PaiementsAdminPage />}
             />
             <Route
               path="/admin/utilisateurs"

@@ -1,7 +1,11 @@
 import { randomBytes } from "node:crypto";
 
 import prisma from "../../config/prisma.js";
-import type { MethodePaiement, Role } from "../../generated/prisma/enums.js";
+import type {
+  MethodePaiement,
+  Role,
+  StatutPaiement,
+} from "../../generated/prisma/enums.js";
 
 import { updateStatutInscription } from "../inscriptions/inscription.service.js";
 
@@ -389,4 +393,192 @@ export async function getMesPaiements(apprenantId: string) {
   });
 
   return paiements.map(versPublic);
+}
+
+// ======================================================
+// ADMIN : LISTE DES PAIEMENTS
+// ======================================================
+
+const selectPaiementAdmin = {
+  id: true,
+  reference: true,
+  montant: true,
+  devise: true,
+  methode: true,
+  telephone: true,
+  statut: true,
+  motifEchec: true,
+  createdAt: true,
+  confirmeAt: true,
+
+  inscription: {
+    select: {
+      id: true,
+      statut: true,
+
+      apprenant: {
+        select: {
+          id: true,
+          nom: true,
+          prenom: true,
+          email: true,
+        },
+      },
+
+      formation: {
+        select: {
+          id: true,
+          titre: true,
+        },
+      },
+    },
+  },
+} as const;
+
+interface GetPaiementsAdminParams {
+  page: number;
+  limit: number;
+  search?: string;
+  statut?: StatutPaiement;
+  methode?: MethodePaiement;
+}
+
+export async function getPaiementsAdmin(params: GetPaiementsAdminParams) {
+  const { page, limit, search, statut, methode } = params;
+
+  const skip = (page - 1) * limit;
+
+  const where = {
+    ...(statut !== undefined && {
+      statut,
+    }),
+
+    ...(methode !== undefined && {
+      methode,
+    }),
+
+    ...(search !== undefined &&
+      search.trim() !== "" && {
+        OR: [
+          {
+            reference: {
+              contains: search.trim(),
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            inscription: {
+              apprenant: {
+                nom: {
+                  contains: search.trim(),
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          },
+          {
+            inscription: {
+              apprenant: {
+                prenom: {
+                  contains: search.trim(),
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          },
+          {
+            inscription: {
+              apprenant: {
+                email: {
+                  contains: search.trim(),
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          },
+          {
+            inscription: {
+              formation: {
+                titre: {
+                  contains: search.trim(),
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          },
+        ],
+      }),
+  };
+
+  const [paiements, total, groupes] = await Promise.all([
+    prisma.paiement.findMany({
+      where,
+
+      skip,
+      take: limit,
+
+      orderBy: {
+        createdAt: "desc",
+      },
+
+      select: selectPaiementAdmin,
+    }),
+
+    prisma.paiement.count({
+      where,
+    }),
+
+    // Statistiques globales, indépendantes des filtres
+    prisma.paiement.groupBy({
+      by: ["statut"],
+
+      _count: {
+        _all: true,
+      },
+
+      _sum: {
+        montant: true,
+      },
+    }),
+  ]);
+
+  const stats = {
+    totalEncaisse: 0,
+    reussis: 0,
+    echoues: 0,
+    enAttente: 0,
+    annules: 0,
+  };
+
+  for (const groupe of groupes) {
+    const nombre = groupe._count._all;
+
+    if (groupe.statut === "REUSSI") {
+      stats.reussis = nombre;
+      stats.totalEncaisse = Number(groupe._sum.montant ?? 0);
+    } else if (groupe.statut === "ECHOUE") {
+      stats.echoues = nombre;
+    } else if (groupe.statut === "EN_ATTENTE") {
+      stats.enAttente = nombre;
+    } else if (groupe.statut === "ANNULE") {
+      stats.annules = nombre;
+    }
+  }
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    paiements: paiements.map(versPublic),
+
+    stats,
+
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasPreviousPage: page > 1,
+      hasNextPage: page < totalPages,
+    },
+  };
 }

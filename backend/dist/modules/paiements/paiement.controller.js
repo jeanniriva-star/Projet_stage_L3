@@ -130,4 +130,72 @@ export async function getMesPaiements(req, res) {
         return repondreErreur(res, error);
     }
 }
+// ======================================================
+// ADMIN : LISTE DES PAIEMENTS
+// ======================================================
+const STATUTS = ["EN_ATTENTE", "REUSSI", "ECHOUE", "ANNULE"];
+export async function getPaiementsAdmin(req, res) {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "Non authentifié",
+            });
+        }
+        const pageRaw = req.query.page;
+        const limitRaw = req.query.limit;
+        const searchRaw = req.query.search;
+        const statutRaw = req.query.statut;
+        const methodeRaw = req.query.methode;
+        const page = typeof pageRaw === "string" ? Number(pageRaw) : 1;
+        const limit = typeof limitRaw === "string" ? Number(limitRaw) : 10;
+        if (!Number.isInteger(page) || page < 1) {
+            return res.status(400).json({
+                message: "Le numéro de page doit être un entier supérieur ou égal à 1",
+            });
+        }
+        if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+            return res.status(400).json({
+                message: "La limite doit être comprise entre 1 et 100",
+            });
+        }
+        const search = typeof searchRaw === "string" ? searchRaw.trim() : undefined;
+        let statut;
+        if (statutRaw !== undefined) {
+            if (typeof statutRaw !== "string" ||
+                !STATUTS.includes(statutRaw)) {
+                return res.status(400).json({
+                    message: "Statut de paiement invalide",
+                });
+            }
+            statut = statutRaw;
+        }
+        let methode;
+        if (methodeRaw !== undefined) {
+            if (typeof methodeRaw !== "string" ||
+                !METHODES.includes(methodeRaw)) {
+                return res.status(400).json({
+                    message: "Moyen de paiement invalide",
+                });
+            }
+            methode = methodeRaw;
+        }
+        const resultat = await paiementService.getPaiementsAdmin({
+            page,
+            limit,
+            ...(search && {
+                search,
+            }),
+            ...(statut && {
+                statut,
+            }),
+            ...(methode && {
+                methode,
+            }),
+        });
+        return res.status(200).json(resultat);
+    }
+    catch (error) {
+        return repondreErreur(res, error);
+    }
+}
 //# sourceMappingURL=paiement.controller.js.map

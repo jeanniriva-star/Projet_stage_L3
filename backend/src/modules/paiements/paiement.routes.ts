@@ -4,6 +4,7 @@ import {
   confirmerPaiement,
   getMesPaiements,
   getPaiement,
+  getPaiementsAdmin,
 } from "./paiement.controller.js";
 
 import { authenticate } from "../../middlewares/auth.middleware.js";
@@ -16,6 +17,13 @@ router.post(
   authenticate,
   authorize("APPRENANT"),
   initierPaiement
+);
+
+router.get(
+  "/paiements",
+  authenticate,
+  authorize("ADMIN"),
+  getPaiementsAdmin
 );
 
 // Doit rester avant "/paiements/:id"
