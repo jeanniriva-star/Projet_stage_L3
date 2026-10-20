@@ -74,20 +74,22 @@ export async function soumettreQCM(
         message: "Les réponses sont obligatoires",
       });
     }
-
     // Vérifier la structure de chaque réponse
     const reponsesInvalides = reponses.some(
       (reponse) =>
         typeof reponse !== "object" ||
         reponse === null ||
         typeof reponse.questionId !== "string" ||
-        typeof reponse.choixId !== "string"
+        !Array.isArray(reponse.choixIds) ||
+        reponse.choixIds.some(
+          (id: unknown) => typeof id !== "string"
+        )
     );
 
     if (reponsesInvalides) {
       return res.status(400).json({
         message:
-          "Chaque réponse doit contenir un questionId et un choixId valides",
+          "Chaque réponse doit contenir un questionId et un tableau choixIds valide",
       });
     }
 

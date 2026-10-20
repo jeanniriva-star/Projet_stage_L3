@@ -47,7 +47,7 @@ export interface QCM {
   description: string | null;
   type: "QCM";
 
-ours: {
+cours: {
     id: string;
     titre: string;
     formationId: string;
@@ -58,7 +58,7 @@ ours: {
 
 export interface ReponseQCM {
   questionId: string;
-  choixId: string;
+  choixIds: string[];
 }
 export async function getQCM(evaluationId: string) {
   const response = await api.get<{ evaluation: QCM }>(

@@ -275,7 +275,7 @@ export async function updateQuestion(req, res) {
             });
         }
         if (message.includes("au moins deux choix") ||
-            message.includes("exactement une bonne réponse")) {
+            message.includes("au moins une bonne réponse")) {
             return res.status(400).json({
                 message,
             });

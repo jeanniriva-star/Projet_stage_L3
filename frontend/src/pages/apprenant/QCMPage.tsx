@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams,useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import {
@@ -11,12 +11,12 @@ import {
 
 function QCMPage() {
   const { evaluationId } = useParams();
-  
 
   const [qcm, setQcm] = useState<QCM | null>(null);
 
+  // Pour chaque question, la liste des choix cochés
   const [reponses, setReponses] = useState<
-    Record<string, string>
+    Record<string, string[]>
   >({});
 
   const [loading, setLoading] = useState(true);
@@ -37,23 +37,21 @@ function QCMPage() {
       }
 
       try {
-
         const evaluations = await getMesEvaluations();
 
-const evaluation = evaluations.find(
-  (item) => item.id === evaluationId
-);
+        const evaluation = evaluations.find(
+          (item) => item.id === evaluationId
+        );
 
-if (evaluation && evaluation.soumissions.length > 0) {
-  navigate("/apprenant/resultats", {
-    replace: true,
-  });
+        if (evaluation && evaluation.soumissions.length > 0) {
+          navigate("/apprenant/resultats", {
+            replace: true,
+          });
 
-  return;
-}
+          return;
+        }
+
         const data = await getQCM(evaluationId);
-
-        console.log("QCM reçu :", data);
 
         setQcm(data);
       } catch (err) {
@@ -65,16 +63,24 @@ if (evaluation && evaluation.soumissions.length > 0) {
     }
 
     chargerQCM();
-  }, [evaluationId,navigate]);
+  }, [evaluationId, navigate]);
 
-  function choisirReponse(
+  function basculerChoix(
     questionId: string,
     choixId: string
   ) {
-    setReponses((prev) => ({
-      ...prev,
-      [questionId]: choixId,
-    }));
+    setReponses((prev) => {
+      const actuels = prev[questionId] ?? [];
+
+      const nouveaux = actuels.includes(choixId)
+        ? actuels.filter((id) => id !== choixId)
+        : [...actuels, choixId];
+
+      return {
+        ...prev,
+        [questionId]: nouveaux,
+      };
+    });
   }
 
   async function handleSubmit(
@@ -91,10 +97,12 @@ if (evaluation && evaluation.soumissions.length > 0) {
       return;
     }
 
-    if (
-      Object.keys(reponses).length !==
-      qcm.questions.length
-    ) {
+    const questionSansReponse = qcm.questions.some(
+      (question) =>
+        (reponses[question.id] ?? []).length === 0
+    );
+
+    if (questionSansReponse) {
       setError(
         "Vous devez répondre à toutes les questions."
       );
@@ -108,11 +116,9 @@ if (evaluation && evaluation.soumissions.length > 0) {
       const payload = qcm.questions.map(
         (question) => ({
           questionId: question.id,
-          choixId: reponses[question.id],
+          choixIds: reponses[question.id] ?? [],
         })
       );
-
-      console.log("Payload QCM :", payload);
 
       const data = await soumettreQCM(
         evaluationId,
@@ -124,11 +130,6 @@ if (evaluation && evaluation.soumissions.length > 0) {
       console.error(err);
 
       if (axios.isAxiosError(err)) {
-        console.log(
-          "Réponse backend :",
-          err.response?.data
-        );
-
         setError(
           err.response?.data?.message ||
             "Impossible de soumettre le QCM."
@@ -164,7 +165,6 @@ if (evaluation && evaluation.soumissions.length > 0) {
   }
 
   if (resultat) {
-   
     return (
       <div className="px-6 py-8">
         <div className="mx-auto max-w-3xl">
@@ -190,7 +190,7 @@ if (evaluation && evaluation.soumissions.length > 0) {
 
               <div className="rounded-xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">
-                  Bonnes réponses
+                  Questions réussies
                 </p>
 
                 <p className="mt-1 text-2xl font-bold text-slate-900">
@@ -210,10 +210,10 @@ if (evaluation && evaluation.soumissions.length > 0) {
             </div>
 
             <Link
-            to="/apprenant/evaluations"
-            className="mt-8 inline-flex rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-cyan-700"
+              to="/apprenant/evaluations"
+              className="mt-8 inline-flex rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-cyan-700"
             >
-            Retour aux évaluations
+              Retour aux évaluations
             </Link>
           </div>
         </div>
@@ -238,6 +238,11 @@ if (evaluation && evaluation.soumissions.length > 0) {
               {qcm.description}
             </p>
           )}
+
+          <p className="mt-3 text-sm text-slate-500">
+            Une question n'est comptée juste que si vous
+            cochez exactement toutes les bonnes réponses.
+          </p>
         </div>
 
         <form
@@ -258,29 +263,31 @@ if (evaluation && evaluation.soumissions.length > 0) {
                   {question.contenu}
                 </h2>
 
+                <p className="mt-1 text-xs text-slate-500">
+                  Plusieurs réponses possibles : cochez toutes
+                  les bonnes réponses.
+                </p>
+
                 <div className="mt-5 space-y-3">
-                  {question.choix.map(
-                    (choix) => (
+                  {question.choix.map((choix) => {
+                    const coche = (
+                      reponses[question.id] ?? []
+                    ).includes(choix.id);
+
+                    return (
                       <label
                         key={choix.id}
                         className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
-                          reponses[question.id] ===
-                          choix.id
+                          coche
                             ? "border-cyan-500 bg-cyan-50"
                             : "border-slate-200 bg-white hover:border-cyan-300"
                         }`}
                       >
                         <input
-                          type="radio"
-                          name={question.id}
-                          value={choix.id}
-                          checked={
-                            reponses[
-                              question.id
-                            ] === choix.id
-                          }
+                          type="checkbox"
+                          checked={coche}
                           onChange={() =>
-                            choisirReponse(
+                            basculerChoix(
                               question.id,
                               choix.id
                             )
@@ -292,8 +299,8 @@ if (evaluation && evaluation.soumissions.length > 0) {
                           {choix.texte}
                         </span>
                       </label>
-                    )
-                  )}
+                    );
+                  })}
                 </div>
               </article>
             )

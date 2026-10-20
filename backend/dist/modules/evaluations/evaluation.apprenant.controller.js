@@ -55,10 +55,11 @@ export async function soumettreQCM(req, res) {
         const reponsesInvalides = reponses.some((reponse) => typeof reponse !== "object" ||
             reponse === null ||
             typeof reponse.questionId !== "string" ||
-            typeof reponse.choixId !== "string");
+            !Array.isArray(reponse.choixIds) ||
+            reponse.choixIds.some((id) => typeof id !== "string"));
         if (reponsesInvalides) {
             return res.status(400).json({
-                message: "Chaque réponse doit contenir un questionId et un choixId valides",
+                message: "Chaque réponse doit contenir un questionId et un tableau choixIds valide",
             });
         }
         const resultat = await evaluationService.soumettreQCM(evaluationId, req.user.id, reponses);

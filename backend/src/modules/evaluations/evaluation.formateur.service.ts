@@ -14,7 +14,8 @@ interface ChoixInput {
 
 /**
  * Règle commune aux questions QCM :
- * au moins deux choix et exactement une bonne réponse.
+ * au moins deux choix et au moins une bonne réponse
+ * (plusieurs bonnes réponses possibles).
  */
 function validerChoixQCM(choix: ChoixInput[]) {
   if (choix.length < 2) {
@@ -27,9 +28,9 @@ function validerChoixQCM(choix: ChoixInput[]) {
     (item) => item.correct
   ).length;
 
-  if (nombreBonnesReponses !== 1) {
+  if (nombreBonnesReponses < 1) {
     throw new Error(
-      "Une question doit contenir exactement une bonne réponse"
+      "Une question doit contenir au moins une bonne réponse"
     );
   }
 }

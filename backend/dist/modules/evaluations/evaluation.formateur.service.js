@@ -2,15 +2,16 @@ import prisma from "../../config/prisma.js";
 import { verifierAccesFormation } from "../affectations/affectation.service.js";
 /**
  * Règle commune aux questions QCM :
- * au moins deux choix et exactement une bonne réponse.
+ * au moins deux choix et au moins une bonne réponse
+ * (plusieurs bonnes réponses possibles).
  */
 function validerChoixQCM(choix) {
     if (choix.length < 2) {
         throw new Error("Une question QCM doit contenir au moins deux choix");
     }
     const nombreBonnesReponses = choix.filter((item) => item.correct).length;
-    if (nombreBonnesReponses !== 1) {
-        throw new Error("Une question doit contenir exactement une bonne réponse");
+    if (nombreBonnesReponses < 1) {
+        throw new Error("Une question doit contenir au moins une bonne réponse");
     }
 }
 /**

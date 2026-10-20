@@ -356,7 +356,7 @@ model ReponseQCM {
   question   Question             @relation(fields: [questionId], references: [id])
   choix      Choix                @relation(fields: [choixId], references: [id])
 
-  @@unique([soumissionId, questionId])
+    @@unique([soumissionId, questionId, choixId])
 }
 
 // ======================================================

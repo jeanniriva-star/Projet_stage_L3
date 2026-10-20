@@ -67,7 +67,7 @@ export async function getQCMForApprenant(
 
 interface ReponseQCMInput {
   questionId: string;
-  choixId: string;
+  choixIds: string[];
 }
 
 export async function soumettreQCM(
@@ -154,20 +154,21 @@ export async function soumettreQCM(
     (reponse) => reponse.questionId
   );
 
-  const questionIdsUniques = new Set(questionIds);
-
-  if (questionIdsUniques.size !== questionIds.length) {
+  if (new Set(questionIds).size !== questionIds.length) {
     throw new Error(
-      "Une question ne peut recevoir qu'une seule réponse"
+      "Une question ne peut apparaître qu'une seule fois"
     );
   }
 
   let nombreBonnesReponses = 0;
 
-  // Réponses qui seront enregistrées ensuite
-  const reponsesAEnregistrer: ReponseQCMInput[] = [];
+  // Une ligne par choix coché
+  const reponsesAEnregistrer: {
+    questionId: string;
+    choixId: string;
+  }[] = [];
 
-  // 7. Vérifier chaque réponse envoyée
+  // 7. Vérifier et corriger chaque question
   for (const reponse of reponses) {
     const question = evaluation.questions.find(
       (question) => question.id === reponse.questionId
@@ -179,24 +180,52 @@ export async function soumettreQCM(
       );
     }
 
-    const choix = question.choix.find(
-      (choix) => choix.id === reponse.choixId
-    );
-
-    if (!choix) {
+    if (reponse.choixIds.length === 0) {
       throw new Error(
-        "Un des choix n'appartient pas à la question indiquée"
+        "Chaque question doit avoir au moins un choix sélectionné"
       );
     }
 
-    if (choix.correct) {
+    const choixCoches = new Set(reponse.choixIds);
+
+    if (choixCoches.size !== reponse.choixIds.length) {
+      throw new Error(
+        "Un choix ne peut être sélectionné qu'une seule fois"
+      );
+    }
+
+    const choixDeLaQuestion = new Set(
+      question.choix.map((choix) => choix.id)
+    );
+
+    for (const choixId of choixCoches) {
+      if (!choixDeLaQuestion.has(choixId)) {
+        throw new Error(
+          "Un des choix n'appartient pas à la question indiquée"
+        );
+      }
+    }
+
+    // Barème tout ou rien : la question compte seulement si
+    // les choix cochés sont exactement les bonnes réponses
+    const bonsChoixIds = question.choix
+      .filter((choix) => choix.correct)
+      .map((choix) => choix.id);
+
+    const questionReussie =
+      bonsChoixIds.length === choixCoches.size &&
+      bonsChoixIds.every((id) => choixCoches.has(id));
+
+    if (questionReussie) {
       nombreBonnesReponses++;
     }
 
-    reponsesAEnregistrer.push({
-      questionId: question.id,
-      choixId: choix.id,
-    });
+    for (const choixId of choixCoches) {
+      reponsesAEnregistrer.push({
+        questionId: question.id,
+        choixId,
+      });
+    }
   }
 
   // 8. Calcul de la note sur 20
@@ -209,7 +238,6 @@ export async function soumettreQCM(
   const note = Math.round(noteBrute * 100) / 100;
 
   // 9. Enregistrer la soumission ET toutes les réponses
-  // dans une seule transaction logique Prisma
   const soumission =
     await prisma.soumissionEvaluation.create({
       data: {
@@ -218,12 +246,7 @@ export async function soumettreQCM(
         note,
 
         reponses: {
-          create: reponsesAEnregistrer.map(
-            (reponse) => ({
-              questionId: reponse.questionId,
-              choixId: reponse.choixId,
-            })
-          ),
+          create: reponsesAEnregistrer,
         },
       },
 
