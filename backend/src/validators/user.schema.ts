@@ -64,3 +64,15 @@ export const changerMotDePasseSchema = z
     path: ["nouveauMotDePasse"],
   });
   
+  // Inscription publique : même règles que registerSchema,
+// plus la confirmation du mot de passe.
+export const registerAvecConfirmationSchema = registerSchema
+  .extend({
+    confirmPassword: z
+      .string()
+      .min(1, "La confirmation du mot de passe est requise"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });

@@ -30,6 +30,7 @@ export interface RegisterData {
   prenom: string;
   email: string;
   password: string;
+  confirmPassword: string;
   telephone: string;
   adresse: string;
 }
