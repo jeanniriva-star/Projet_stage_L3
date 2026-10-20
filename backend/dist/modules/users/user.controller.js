@@ -5,6 +5,7 @@ export async function getUsers(req, res) {
         const limitRaw = req.query.limit;
         const searchRaw = req.query.search;
         const roleRaw = req.query.role;
+        const formationIdRaw = req.query.formationId;
         const page = typeof pageRaw === "string"
             ? Number(pageRaw)
             : 1;
@@ -42,6 +43,10 @@ export async function getUsers(req, res) {
             }
             role = roleRaw;
         }
+        const formationId = typeof formationIdRaw === "string" &&
+            formationIdRaw.trim() !== ""
+            ? formationIdRaw.trim()
+            : undefined;
         const resultat = await userService.getUsersPagines({
             page,
             limit,
@@ -50,6 +55,9 @@ export async function getUsers(req, res) {
             }),
             ...(role && {
                 role,
+            }),
+            ...(formationId && {
+                formationId,
             }),
         });
         return res.status(200).json(resultat);

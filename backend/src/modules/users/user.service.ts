@@ -276,16 +276,18 @@ interface GetUsersParams {
   limit: number;
   search?: string;
   role?: Role;
+  formationId?: string;
 }
 
 export async function getUsersPagines(
   params: GetUsersParams
 ) {
-  const {
+   const {
     page,
     limit,
     search,
     role,
+    formationId,
   } = params;
 
   const skip = (page - 1) * limit;
@@ -324,6 +326,32 @@ export async function getUsersPagines(
           },
         ],
       }),
+
+          // Utilisateurs liés à la formation choisie.
+    // On passe par AND pour ne pas écraser le OR de la recherche.
+    ...(formationId !== undefined && {
+      AND: [
+        {
+          OR: [
+            {
+              affectations: {
+                some: { formationId },
+              },
+            },
+            {
+              inscriptions: {
+                some: { formationId },
+              },
+            },
+            {
+              formationsCreees: {
+                some: { id: formationId },
+              },
+            },
+          ],
+        },
+      ],
+    }),
   };
 
   const [

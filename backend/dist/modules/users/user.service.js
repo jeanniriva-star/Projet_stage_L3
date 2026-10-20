@@ -193,7 +193,7 @@ export async function changerMotDePasse(userId, ancienMotDePasse, nouveauMotDePa
     };
 }
 export async function getUsersPagines(params) {
-    const { page, limit, search, role, } = params;
+    const { page, limit, search, role, formationId, } = params;
     const skip = (page - 1) * limit;
     const where = {
         ...(role !== undefined && {
@@ -225,6 +225,31 @@ export async function getUsersPagines(params) {
                         contains: search.trim(),
                         mode: "insensitive",
                     },
+                },
+            ],
+        }),
+        // Utilisateurs liés à la formation choisie.
+        // On passe par AND pour ne pas écraser le OR de la recherche.
+        ...(formationId !== undefined && {
+            AND: [
+                {
+                    OR: [
+                        {
+                            affectations: {
+                                some: { formationId },
+                            },
+                        },
+                        {
+                            inscriptions: {
+                                some: { formationId },
+                            },
+                        },
+                        {
+                            formationsCreees: {
+                                some: { id: formationId },
+                            },
+                        },
+                    ],
                 },
             ],
         }),

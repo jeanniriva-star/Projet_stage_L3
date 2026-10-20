@@ -1,10 +1,18 @@
 import type { FormEvent } from "react";
 
+export interface FormationOption {
+  id: string;
+  titre: string;
+}
+
 interface UsersFiltersProps {
   recherche: string;
   roleFiltre: string;
+  formationFiltre: string;
+  formations: FormationOption[];
   onRechercheChange: (value: string) => void;
   onRoleChange: (role: string) => void;
+  onFormationChange: (formationId: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onReset: () => void;
 }
@@ -12,8 +20,11 @@ interface UsersFiltersProps {
 function UsersFilters({
   recherche,
   roleFiltre,
+  formationFiltre,
+  formations,
   onRechercheChange,
   onRoleChange,
+  onFormationChange,
   onSubmit,
   onReset,
 }: UsersFiltersProps) {
@@ -21,7 +32,7 @@ function UsersFilters({
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <form
         onSubmit={onSubmit}
-        className="grid gap-4 lg:grid-cols-[1fr_220px_auto]"
+        className="grid gap-4 lg:grid-cols-[1fr_200px_260px_auto]"
       >
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -54,6 +65,26 @@ function UsersFilters({
           </select>
         </div>
 
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">
+            Formation
+          </label>
+
+          <select
+            value={formationFiltre}
+            onChange={(e) => onFormationChange(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-600"
+          >
+            <option value="">Toutes</option>
+
+            {formations.map((formation) => (
+              <option key={formation.id} value={formation.id}>
+                {formation.titre}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex items-end">
           <button
             type="submit"
@@ -64,12 +95,12 @@ function UsersFilters({
         </div>
       </form>
 
-      {(recherche || roleFiltre) && (
+      {(recherche || roleFiltre || formationFiltre) && (
         <button
           type="button"
           onClick={onReset}
           className="mt-4 text-sm font-semibold text-cyan-700 hover:text-cyan-800"
-            >
+        >
           Réinitialiser les filtres
         </button>
       )}

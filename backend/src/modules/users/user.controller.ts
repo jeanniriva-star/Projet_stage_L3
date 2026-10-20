@@ -10,6 +10,7 @@ export async function getUsers(
     const limitRaw = req.query.limit;
     const searchRaw = req.query.search;
     const roleRaw = req.query.role;
+    const formationIdRaw = req.query.formationId;
 
     const page =
       typeof pageRaw === "string"
@@ -80,6 +81,12 @@ export async function getUsers(
         | "APPRENANT";
     }
 
+      const formationId =
+      typeof formationIdRaw === "string" &&
+      formationIdRaw.trim() !== ""
+        ? formationIdRaw.trim()
+        : undefined;
+
     const resultat =
       await userService.getUsersPagines({
         page,
@@ -89,6 +96,9 @@ export async function getUsers(
         }),
         ...(role && {
           role,
+        }),
+        ...(formationId && {
+          formationId,
         }),
       });
 

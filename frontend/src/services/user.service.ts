@@ -17,7 +17,8 @@ export async function getUsersAdmin(
   page = 1,
   limit = 10,
   search = "",
-  role = ""
+  role = "",
+  formationId = ""
 ) {
   const response = await api.get<UsersResponse>("/users", {
     params: {
@@ -25,6 +26,7 @@ export async function getUsersAdmin(
       limit,
       ...(search.trim() && { search: search.trim() }),
       ...(role && { role }),
+      ...(formationId && { formationId }),
     },
   });
 

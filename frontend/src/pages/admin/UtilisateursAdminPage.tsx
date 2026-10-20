@@ -18,11 +18,14 @@ import type {
 import { getErrorMessage } from "../../utils/errors";
 import Pagination from "../../components/common/Pagination";
 import UserCreateForm from "../../components/admin/utilisateurs/UserCreateForm";
-import UsersFilters from "../../components/admin/utilisateurs/UsersFilters";
 import UsersTable from "../../components/admin/utilisateurs/UsersTable";
 import DeleteWarningModal from "../../components/admin/utilisateurs/DeleteWarningModal";
 import DeleteVerificationModal from "../../components/admin/utilisateurs/DeleteVerificationModal";
 import DeleteConfirmModal from "../../components/admin/utilisateurs/DeleteConfirmModal";
+import { getFormationsAdmin } from "../../services/formation.service";
+import UsersFilters, {
+  type FormationOption,
+} from "../../components/admin/utilisateurs/UsersFilters";
 
 function UtilisateursAdminPage() {
   // =====================================================
@@ -39,6 +42,8 @@ function UtilisateursAdminPage() {
 
   const [recherche, setRecherche] = useState("");
   const [roleFiltre, setRoleFiltre] = useState("");
+  const [formationFiltre, setFormationFiltre] = useState("");
+  const [formations, setFormations] = useState<FormationOption[]>([]);
 
   // =====================================================
   // PAGINATION
@@ -76,10 +81,11 @@ function UtilisateursAdminPage() {
   // CHARGEMENT
   // =====================================================
 
-  async function chargerUtilisateurs(
+   async function chargerUtilisateurs(
     pageDemandee = page,
     rechercheDemandee = recherche,
-    roleDemande = roleFiltre
+    roleDemande = roleFiltre,
+    formationDemandee = formationFiltre
   ) {
     try {
       setLoading(true);
@@ -89,7 +95,8 @@ function UtilisateursAdminPage() {
         pageDemandee,
         10,
         rechercheDemandee,
-        roleDemande
+        roleDemande,
+        formationDemandee
       );
 
       setUtilisateurs(data.utilisateurs);
@@ -143,28 +150,67 @@ function UtilisateursAdminPage() {
       annule = true;
     };
   }, []);
+  useEffect(() => {
+    let annule = false;
+
+    async function chargerFormations() {
+      try {
+        const data = await getFormationsAdmin(1, 100);
+
+        if (annule) {
+          return;
+        }
+
+        setFormations(
+          data.formations
+            .map((formation) => ({
+              id: formation.id,
+              titre: formation.titre,
+            }))
+            .sort((a, b) => a.titre.localeCompare(b.titre, "fr"))
+        );
+      } catch (err: unknown) {
+        // Le filtre par formation restera simplement vide
+        console.error("Erreur chargement formations :", err);
+      }
+    }
+
+    chargerFormations();
+
+    return () => {
+      annule = true;
+    };
+  }, []);
+
 
   // =====================================================
   // RECHERCHE ET FILTRES
   // =====================================================
 
-  async function handleRecherche(event: FormEvent<HTMLFormElement>) {
+    async function handleRecherche(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    await chargerUtilisateurs(1, recherche, roleFiltre);
+    await chargerUtilisateurs(1, recherche, roleFiltre, formationFiltre);
   }
 
-  async function handleRoleFilter(role: string) {
+    async function handleRoleFilter(role: string) {
     setRoleFiltre(role);
 
-    await chargerUtilisateurs(1, recherche, role);
+    await chargerUtilisateurs(1, recherche, role, formationFiltre);
+  }
+
+  async function handleFormationFilter(formationId: string) {
+    setFormationFiltre(formationId);
+
+    await chargerUtilisateurs(1, recherche, roleFiltre, formationId);
   }
 
   function handleResetFiltres() {
     setRecherche("");
     setRoleFiltre("");
+    setFormationFiltre("");
 
-    void chargerUtilisateurs(1, "", "");
+    void chargerUtilisateurs(1, "", "", "");
   }
 
   // =====================================================
@@ -332,11 +378,14 @@ function UtilisateursAdminPage() {
           />
         )}
 
-        <UsersFilters
+                <UsersFilters
           recherche={recherche}
           roleFiltre={roleFiltre}
+          formationFiltre={formationFiltre}
+          formations={formations}
           onRechercheChange={setRecherche}
           onRoleChange={handleRoleFilter}
+          onFormationChange={handleFormationFilter}
           onSubmit={handleRecherche}
           onReset={handleResetFiltres}
         />
