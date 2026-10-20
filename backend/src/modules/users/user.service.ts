@@ -327,7 +327,7 @@ export async function getUsersPagines(
   };
 
   const [
-    utilisateurs,
+    utilisateursBruts,
     total,
   ] = await Promise.all([
     prisma.user.findMany({
@@ -350,6 +350,40 @@ export async function getUsersPagines(
         role: true,
         createdAt: true,
         updatedAt: true,
+
+        // Formateur : formations où il est affecté
+        affectations: {
+          select: {
+            formation: {
+              select: {
+                id: true,
+                titre: true,
+              },
+            },
+          },
+        },
+
+        // Apprenant : formations où il est inscrit
+        inscriptions: {
+          select: {
+            statut: true,
+
+            formation: {
+              select: {
+                id: true,
+                titre: true,
+              },
+            },
+          },
+        },
+
+        // Admin : formations qu'il a créées
+        formationsCreees: {
+          select: {
+            id: true,
+            titre: true,
+          },
+        },
       },
     }),
 
@@ -357,6 +391,36 @@ export async function getUsersPagines(
       where,
     }),
   ]);
+
+  // On ne renvoie qu'une seule liste "formations",
+  // choisie selon le rôle de l'utilisateur
+  const utilisateurs = utilisateursBruts.map(
+    ({
+      affectations,
+      inscriptions,
+      formationsCreees,
+      ...utilisateur
+    }) => ({
+      ...utilisateur,
+
+      formations:
+        utilisateur.role === "FORMATEUR"
+          ? affectations.map((affectation) => ({
+              id: affectation.formation.id,
+              titre: affectation.formation.titre,
+            }))
+          : utilisateur.role === "APPRENANT"
+            ? inscriptions.map((inscription) => ({
+                id: inscription.formation.id,
+                titre: inscription.formation.titre,
+                statut: inscription.statut,
+              }))
+            : formationsCreees.map((formation) => ({
+                id: formation.id,
+                titre: formation.titre,
+              })),
+    })
+  );
 
   const totalPages =
     Math.ceil(total / limit);
@@ -374,7 +438,6 @@ export async function getUsersPagines(
     },
   };
 }
-
 export async function checkUserDeletion(
   userId: string,
   currentUserId: string

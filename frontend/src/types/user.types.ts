@@ -1,5 +1,12 @@
 export type UserRole = "ADMIN" | "FORMATEUR" | "APPRENANT";
 
+export interface FormationUtilisateur {
+  id: string;
+  titre: string;
+  // Présent uniquement pour les apprenants (statut de l'inscription)
+  statut?: "EN_ATTENTE" | "VALIDEE" | "REFUSEE";
+}
+
 export interface UserAdmin {
   id: string;
   nom: string;
@@ -10,8 +17,12 @@ export interface UserAdmin {
   role: UserRole;
   createdAt: string;
   updatedAt: string;
-}
 
+  // Renvoyé par la liste des utilisateurs :
+  // formateur = formations affectées, apprenant = formations inscrites,
+  // admin = formations créées
+  formations?: FormationUtilisateur[];
+}
 export interface UsersResponse {
   utilisateurs: UserAdmin[];
 
