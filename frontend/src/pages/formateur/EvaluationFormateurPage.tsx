@@ -657,9 +657,9 @@ function EvaluationFormateurPage() {
 
               <p className="mt-1 text-sm text-slate-500">
                 Ajoutez plusieurs choix et cochez une ou plusieurs
-                bonnes réponses. Une question est comptée juste
-                seulement si l'apprenant coche exactement les
-                bonnes réponses.
+                bonnes réponses. Chaque bonne réponse cochée par
+                l'apprenant rapporte une part de la question ;
+                chaque mauvaise réponse cochée en retire une part.
               </p>
             </div>
 

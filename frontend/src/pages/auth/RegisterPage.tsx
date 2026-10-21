@@ -80,10 +80,10 @@ function RegisterPage() {
         adresse,
       });
 
-      if (formationId) {
+       if (formationId) {
         navigate(`/login?formationId=${formationId}`);
       } else {
-        navigate("/login");
+        navigate("/login?choisir=formation");
       }
     } catch (err) {
       console.error(err);

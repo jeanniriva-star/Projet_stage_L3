@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Footer from "../../components/Footer";
 import { formatPrix, formatType, NIVEAUX } from "../../utils/format";
+import BoutonInscription from "../../components/BoutonInscription";
 
 import {
   getFormations,
@@ -75,12 +76,12 @@ function FormationCard({ formation }: { formation: Formation }) {
           Voir détails
         </Link>
 
-        <Link
-          to={`/register?formationId=${formation.id}`}
+          <BoutonInscription
+          formationId={formation.id}
           className="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
         >
           S'inscrire
-        </Link>
+        </BoutonInscription>
       </div>
     </article>
   );

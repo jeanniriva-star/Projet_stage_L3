@@ -174,31 +174,6 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-16">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-cyan-700">
-                Catalogue
-              </p>
-
-              <h2 className="mt-2 text-3xl font-bold text-slate-900">
-                Formations disponibles
-              </h2>
-
-              <p className="mt-3 max-w-2xl text-slate-600">
-                Consultez les formations proposées et choisissez celle qui
-                correspond à vos objectifs.
-              </p>
-            </div>
-
-            <Link
-              to="/formations"
-              className="font-semibold text-cyan-700 hover:text-cyan-900"
-            >
-              Voir tout →
-            </Link>
-          </div>
-        </section>
       </main>
 
       <Footer />

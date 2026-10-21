@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import { useAuth } from "../../hooks/useAuth";
-import { inscrireFormation } from "../../services/inscription.service";
+import { demarrerInscription } from "../../services/inscription.service";
+import { getErrorMessage } from "../../utils/errors";
 import logoSprayInfo from "../../assets/logo_spray.jpg";
 import { isValidEmail } from "../../utils/validation";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function LoginPage() {
   const { loginUser } = useAuth();
   const [searchParams] = useSearchParams();
   const formationId = searchParams.get("formationId");
+  const choisirFormation = searchParams.get("choisir") === "formation";
   const [erreurEmail, setErreurEmail] = useState("");
   const [afficherMdp, setAfficherMdp] = useState(false);
 
@@ -37,31 +39,29 @@ function LoginPage() {
     });
 
      loginUser(data.token, data.user);
-     if (formationId && data.user.role === "APPRENANT") {
-  try {
-       const resultat = await inscrireFormation(formationId);
+        if (formationId && data.user.role === "APPRENANT") {
+       try {
+         const message = await demarrerInscription(formationId, navigate);
 
-    navigate(
-      `/inscription-en-attente?formationId=${formationId}`,
-      {
-        state: {
-          formation: resultat.inscription.formation,
-        },
-      }
-    );
+         if (message) {
+           window.alert(message);
+           navigate("/apprenant");
+         }
 
-    return;
-  } catch (error) {
-    console.error(error);
+         return;
+       } catch (error) {
+         console.error(error);
 
-    setErreur(
-      "Vous êtes peut-être déjà inscrit à cette formation."
-    );
+         setErreur(
+           getErrorMessage(
+             error,
+             "Impossible de vous inscrire à cette formation."
+           )
+         );
 
-    return;
-  }
-}
-
+         return;
+       }
+     }
       switch (data.user.role) {
         case "ADMIN":
           navigate("/admin");
@@ -71,8 +71,8 @@ function LoginPage() {
           navigate("/formateur");
           break;
 
-        case "APPRENANT":
-          navigate("/apprenant");
+                case "APPRENANT":
+          navigate(choisirFormation ? "/formations" : "/apprenant");
           break;
       }
     } catch (error) {
@@ -195,6 +195,22 @@ return (
           {chargement ? "Connexion..." : "Se connecter"}
         </button>
       </form>
+            <div className="mt-6 text-center">
+        <p className="text-sm text-slate-600">
+          Pas encore de compte ?
+        </p>
+
+        <Link
+          to={
+            formationId
+              ? `/register?formationId=${formationId}`
+              : "/register"
+          }
+          className="mt-3 block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-800 transition hover:border-cyan-500 hover:text-cyan-700"
+        >
+          Créer un compte
+        </Link>
+      </div>
 
       <div className="mt-8 pt-6 border-t border-slate-200 text-center">
         <p className="text-xs text-slate-400">

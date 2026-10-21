@@ -15,13 +15,19 @@ function InscriptionPendingPage() {
   const navigate = useNavigate();
 
   // La formation est transmise par la page qui a envoyé l'inscription
-  const formation = (
-    location.state as { formation?: FormationPaiement } | null
-  )?.formation;
+  const etat = location.state as {
+    formation?: FormationPaiement;
+    ouvrirPaiement?: boolean;
+  } | null;
 
-  const [showPaiement, setShowPaiement] = useState(false);
+  const formation = etat?.formation;
 
   const peutPayer = formation !== undefined && Number(formation.prix) > 0;
+
+  // La modale s'ouvre directement quand l'apprenant vient de cliquer "S'inscrire"
+  const [showPaiement, setShowPaiement] = useState(
+    Boolean(etat?.ouvrirPaiement) && peutPayer
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-12">

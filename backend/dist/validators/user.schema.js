@@ -50,4 +50,16 @@ export const changerMotDePasseSchema = z
     message: "Le nouveau mot de passe doit être différent de l'ancien",
     path: ["nouveauMotDePasse"],
 });
+// Inscription publique : même règles que registerSchema,
+// plus la confirmation du mot de passe.
+export const registerAvecConfirmationSchema = registerSchema
+    .extend({
+    confirmPassword: z
+        .string()
+        .min(1, "La confirmation du mot de passe est requise"),
+})
+    .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+});
 //# sourceMappingURL=user.schema.js.map

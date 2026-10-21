@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import type { NavigateFunction } from "react-router-dom";
 
 export type StatutInscription =
   | "EN_ATTENTE"
@@ -37,6 +38,73 @@ export async function inscrireFormation(
   return response.data;
 }
 
+export interface MonInscription {
+  id: string;
+  statut: StatutInscription;
+  dateInscription: string;
+
+  formation: {
+    id: string;
+    titre: string;
+    description: string | null;
+    prix: string;
+  };
+}
+
+export async function getMesInscriptions() {
+  const response = await api.get<{ inscriptions: MonInscription[] }>(
+    "/inscriptions/mes-inscriptions"
+  );
+
+  return response.data.inscriptions;
+}
+
+/**
+ * Clic sur "S'inscrire" d'un apprenant connecté :
+ *  - aucune inscription     -> on la crée, puis page de paiement
+ *  - inscription en attente -> page de paiement
+ *  - inscription validée    -> page de la formation
+ *  - inscription refusée    -> message à afficher
+ *
+ * Renvoie un message à afficher si l'apprenant ne peut pas continuer,
+ * sinon null (la navigation a déjà eu lieu).
+ */
+export async function demarrerInscription(
+  formationId: string,
+  navigate: NavigateFunction
+): Promise<string | null> {
+  const inscriptions = await getMesInscriptions();
+
+  const existante = inscriptions.find(
+    (inscription) => inscription.formation.id === formationId
+  );
+
+  if (existante?.statut === "VALIDEE") {
+    navigate(`/apprenant/formations/${formationId}`);
+    return null;
+  }
+
+  if (existante?.statut === "REFUSEE") {
+    return "Votre demande d'inscription à cette formation a été refusée. Contactez le centre pour plus d'informations.";
+  }
+
+  const formation = existante
+    ? existante.formation
+    : (await inscrireFormation(formationId)).inscription.formation;
+
+  navigate(`/inscription-en-attente?formationId=${formationId}`, {
+    state: {
+      formation: {
+        id: formation.id,
+        titre: formation.titre,
+        prix: formation.prix,
+      },
+      ouvrirPaiement: true,
+    },
+  });
+
+  return null;
+}
 // ======================================================
 // ADMIN - INSCRIPTIONS EN ATTENTE
 // ======================================================

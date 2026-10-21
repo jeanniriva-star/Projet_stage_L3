@@ -1,5 +1,23 @@
 import prisma from "../../config/prisma.js";
 
+function arrondir(valeur: number) {
+  return Math.round(valeur * 100) / 100;
+}
+
+function moyenne(valeurs: number[]) {
+  return valeurs.length > 0
+    ? arrondir(
+        valeurs.reduce((somme, valeur) => somme + valeur, 0) /
+          valeurs.length
+      )
+    : null;
+}
+
+function extraireNotes(soumissions: { note: number | null }[]) {
+  return soumissions
+    .map((soumission) => soumission.note)
+    .filter((note): note is number => note !== null);
+}
 export async function getDashboardAdmin() {
   const [
     nombreUtilisateurs,
@@ -9,6 +27,7 @@ export async function getDashboardAdmin() {
     inscriptionsEnAttente,
     nombreSessions,
     nombreEvaluations,
+    formationsBrutes,
   ] = await Promise.all([
     prisma.user.count(),
 
@@ -35,7 +54,73 @@ export async function getDashboardAdmin() {
     prisma.session.count(),
 
     prisma.evaluation.count(),
+
+    // Données brutes pour les statistiques par formation
+    prisma.formation.findMany({
+      select: {
+        id: true,
+        titre: true,
+
+        inscriptions: {
+          where: {
+            statut: "VALIDEE",
+          },
+
+          select: {
+            apprenant: {
+              select: {
+                id: true,
+                nom: true,
+                prenom: true,
+              },
+            },
+
+            soumissions: {
+              select: {
+                note: true,
+              },
+            },
+          },
+        },
+      },
+    }),
   ]);
+
+  const statsFormations = formationsBrutes
+    .map((formation) => {
+      // Toutes les notes de QCM de la formation
+      const toutesLesNotes = formation.inscriptions.flatMap(
+        (inscription) => extraireNotes(inscription.soumissions)
+      );
+
+      // Progression : moyenne des QCM de chaque apprenant
+      // (seulement ceux qui ont passé au moins un QCM)
+      const apprenants = formation.inscriptions
+        .map((inscription) => {
+          const notes = extraireNotes(inscription.soumissions);
+
+          return {
+            id: inscription.apprenant.id,
+            nom: inscription.apprenant.nom,
+            prenom: inscription.apprenant.prenom,
+            nombreQcm: notes.length,
+            moyenne: moyenne(notes),
+          };
+        })
+        .filter((apprenant) => apprenant.moyenne !== null)
+        .sort((a, b) => (b.moyenne ?? 0) - (a.moyenne ?? 0));
+
+      return {
+        id: formation.id,
+        titre: formation.titre,
+        inscritsValides: formation.inscriptions.length,
+        nombreSoumissions: toutesLesNotes.length,
+        noteMoyenne: moyenne(toutesLesNotes),
+        apprenants,
+      };
+    })
+    // Les plus suivies en premier
+    .sort((a, b) => b.inscritsValides - a.inscritsValides);
 
   return {
     utilisateurs: {
@@ -53,6 +138,8 @@ export async function getDashboardAdmin() {
     sessions: nombreSessions,
 
     evaluations: nombreEvaluations,
+
+    statsFormations,
   };
 }
 

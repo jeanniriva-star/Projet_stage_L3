@@ -25,6 +25,7 @@ function QCMPage() {
   const navigate = useNavigate();
   const [resultat, setResultat] = useState<{
     noteSur20: number;
+    pointsObtenus: number;
     bonnesReponses: number;
     nombreQuestions: number;
   } | null>(null);
@@ -176,7 +177,6 @@ function QCMPage() {
             <h1 className="mt-2 text-3xl font-bold text-slate-900">
               QCM terminé
             </h1>
-
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <div className="rounded-xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">
@@ -190,21 +190,21 @@ function QCMPage() {
 
               <div className="rounded-xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">
-                  Questions réussies
+                  Points
                 </p>
 
                 <p className="mt-1 text-2xl font-bold text-slate-900">
-                  {resultat.bonnesReponses}
+                  {resultat.pointsObtenus}/{resultat.nombreQuestions}
                 </p>
               </div>
 
               <div className="rounded-xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">
-                  Questions
+                  Questions entièrement justes
                 </p>
 
                 <p className="mt-1 text-2xl font-bold text-slate-900">
-                  {resultat.nombreQuestions}
+                  {resultat.bonnesReponses}
                 </p>
               </div>
             </div>
@@ -240,8 +240,9 @@ function QCMPage() {
           )}
 
           <p className="mt-3 text-sm text-slate-500">
-            Une question n'est comptée juste que si vous
-            cochez exactement toutes les bonnes réponses.
+            Chaque bonne réponse cochée rapporte des points,
+            chaque mauvaise réponse cochée en retire. Cochez
+            uniquement les réponses que vous pensez justes.
           </p>
         </div>
 

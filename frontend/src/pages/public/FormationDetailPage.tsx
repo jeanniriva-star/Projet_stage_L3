@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
+import BoutonInscription from "../../components/BoutonInscription";
 import { formatPrix, formatType } from "../../utils/format";
 
 import {
@@ -99,12 +100,12 @@ function FormationDetailPage() {
             {formatPrix(formation.prix)}
           </p>
 
-          <Link
-            to={`/register?formationId=${formation.id}`}
-            className="mt-6 block rounded-xl bg-slate-900 px-5 py-3 text-center font-semibold text-white transition hover:bg-cyan-700"
-            >
+            <BoutonInscription
+            formationId={formation.id}
+            className="mt-6 block w-full rounded-xl bg-slate-900 px-5 py-3 text-center font-semibold text-white transition hover:bg-cyan-700"
+          >
             S'inscrire à cette formation
-          </Link>
+          </BoutonInscription>
 
           <Link
             to="/formations"

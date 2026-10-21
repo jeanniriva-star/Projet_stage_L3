@@ -103,7 +103,8 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
     if (new Set(questionIds).size !== questionIds.length) {
         throw new Error("Une question ne peut apparaître qu'une seule fois");
     }
-    let nombreBonnesReponses = 0;
+    let pointsTotal = 0;
+    let questionsReussies = 0;
     // Une ligne par choix coché
     const reponsesAEnregistrer = [];
     // 7. Vérifier et corriger chaque question
@@ -125,15 +126,22 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
                 throw new Error("Un des choix n'appartient pas à la question indiquée");
             }
         }
-        // Barème tout ou rien : la question compte seulement si
-        // les choix cochés sont exactement les bonnes réponses
+        // Barème proportionnel : chaque bonne réponse cochée rapporte
+        // 1 / (nombre de bonnes réponses) de point, chaque mauvaise
+        // réponse cochée en retire autant (sans descendre sous 0).
         const bonsChoixIds = question.choix
             .filter((choix) => choix.correct)
             .map((choix) => choix.id);
-        const questionReussie = bonsChoixIds.length === choixCoches.size &&
-            bonsChoixIds.every((id) => choixCoches.has(id));
-        if (questionReussie) {
-            nombreBonnesReponses++;
+        const bonsCoches = bonsChoixIds.filter((id) => choixCoches.has(id)).length;
+        const mauvaisCoches = choixCoches.size - bonsCoches;
+        const pointsQuestion = bonsChoixIds.length === 0
+            ? 0
+            : Math.max(0, (bonsCoches - mauvaisCoches) / bonsChoixIds.length);
+        pointsTotal += pointsQuestion;
+        // Question entièrement juste : toutes les bonnes, aucune mauvaise
+        if (bonsCoches === bonsChoixIds.length &&
+            mauvaisCoches === 0) {
+            questionsReussies++;
         }
         for (const choixId of choixCoches) {
             reponsesAEnregistrer.push({
@@ -142,10 +150,7 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
             });
         }
     }
-    // 8. Calcul de la note sur 20
-    const noteBrute = (nombreBonnesReponses /
-        evaluation.questions.length) *
-        20;
+    const noteBrute = (pointsTotal / evaluation.questions.length) * 20;
     // Exemple : 13.333333 devient 13.33
     const note = Math.round(noteBrute * 100) / 100;
     // 9. Enregistrer la soumission ET toutes les réponses
@@ -186,7 +191,8 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
         soumission,
         resultat: {
             nombreQuestions: evaluation.questions.length,
-            bonnesReponses: nombreBonnesReponses,
+            pointsObtenus: Math.round(pointsTotal * 100) / 100,
+            bonnesReponses: questionsReussies,
             noteSur20: note,
         },
     };
