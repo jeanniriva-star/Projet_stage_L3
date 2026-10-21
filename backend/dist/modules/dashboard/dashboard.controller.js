@@ -20,6 +20,27 @@ export async function getDashboardAdmin(req, res) {
         });
     }
 }
+export async function getStatistiquesAdmin(req, res) {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "Non authentifié",
+            });
+        }
+        const statsFormations = await dashboardService.getStatistiquesFormations();
+        return res.status(200).json({
+            statsFormations,
+        });
+    }
+    catch (error) {
+        const message = error instanceof Error
+            ? error.message
+            : "Erreur interne du serveur";
+        return res.status(500).json({
+            message,
+        });
+    }
+}
 export async function getDashboardFormateur(req, res) {
     try {
         if (!req.user) {

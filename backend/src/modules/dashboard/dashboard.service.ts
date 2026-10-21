@@ -27,7 +27,6 @@ export async function getDashboardAdmin() {
     inscriptionsEnAttente,
     nombreSessions,
     nombreEvaluations,
-    formationsBrutes,
   ] = await Promise.all([
     prisma.user.count(),
 
@@ -54,39 +53,58 @@ export async function getDashboardAdmin() {
     prisma.session.count(),
 
     prisma.evaluation.count(),
+  ]);
 
-    // Données brutes pour les statistiques par formation
-    prisma.formation.findMany({
-      select: {
-        id: true,
-        titre: true,
+  return {
+    utilisateurs: {
+      total: nombreUtilisateurs,
+      formateurs: nombreFormateurs,
+      apprenants: nombreApprenants,
+    },
 
-        inscriptions: {
-          where: {
-            statut: "VALIDEE",
+    formations: nombreFormations,
+
+    inscriptions: {
+      enAttente: inscriptionsEnAttente,
+    },
+
+    sessions: nombreSessions,
+
+    evaluations: nombreEvaluations,
+  };
+}
+
+export async function getStatistiquesFormations() {
+  const formationsBrutes = await prisma.formation.findMany({
+    select: {
+      id: true,
+      titre: true,
+
+      inscriptions: {
+        where: {
+          statut: "VALIDEE",
+        },
+
+        select: {
+          apprenant: {
+            select: {
+              id: true,
+              nom: true,
+              prenom: true,
+            },
           },
 
-          select: {
-            apprenant: {
-              select: {
-                id: true,
-                nom: true,
-                prenom: true,
-              },
-            },
-
-            soumissions: {
-              select: {
-                note: true,
-              },
+          soumissions: {
+            select: {
+              note: true,
             },
           },
         },
       },
-    }),
-  ]);
+    },
+  });
 
-  const statsFormations = formationsBrutes
+  return formationsBrutes
     .map((formation) => {
       // Toutes les notes de QCM de la formation
       const toutesLesNotes = formation.inscriptions.flatMap(
@@ -121,26 +139,6 @@ export async function getDashboardAdmin() {
     })
     // Les plus suivies en premier
     .sort((a, b) => b.inscritsValides - a.inscritsValides);
-
-  return {
-    utilisateurs: {
-      total: nombreUtilisateurs,
-      formateurs: nombreFormateurs,
-      apprenants: nombreApprenants,
-    },
-
-    formations: nombreFormations,
-
-    inscriptions: {
-      enAttente: inscriptionsEnAttente,
-    },
-
-    sessions: nombreSessions,
-
-    evaluations: nombreEvaluations,
-
-    statsFormations,
-  };
 }
 
 export async function getDashboardFormateur(

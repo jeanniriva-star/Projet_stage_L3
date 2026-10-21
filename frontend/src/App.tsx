@@ -43,6 +43,7 @@ import MesCoursFormateurPage from "./pages/formateur/MesCoursFormateurPage";
 import SessionsFormateurPage from "./pages/formateur/SessionsFormateurPage";
 import AdminLayout from "./layouts/AdminLayout";
 import PaiementsAdminPage from "./pages/admin/PaiementsAdminPage";
+import StatistiquesAdminPage from "./pages/admin/StatistiquesAdminPage";
 
 
 function App() {
@@ -94,6 +95,10 @@ function App() {
             <Route
               path="/admin/paiements"
               element={<PaiementsAdminPage />}
+            />
+                        <Route
+              path="/admin/statistiques"
+              element={<StatistiquesAdminPage />}
             />
             <Route
               path="/admin/utilisateurs"

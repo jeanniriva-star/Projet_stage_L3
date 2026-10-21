@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { getDashboardAdmin,
+  getStatistiquesAdmin,
   getDashboardFormateur,
    getFormateurDashboard,
   getDashboardApprenant,
@@ -16,6 +17,12 @@ router.get(
   authenticate,
   authorize("ADMIN"),
   getDashboardAdmin
+);
+router.get(
+  "/admin/statistiques",
+  authenticate,
+  authorize("ADMIN"),
+  getStatistiquesAdmin
 );
 router.get(
   "/formateur",

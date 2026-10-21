@@ -1,17 +1,46 @@
 import { NavLink, Outlet } from "react-router-dom";
+import {
+  ClipboardList,
+  CreditCard,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  TrendingUp,
+  User,
+  UserCheck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 import { useAuth } from "../hooks/useAuth";
 
-function AdminLayout() {
-  //const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-function handleLogout() {
-  logout("/");
+interface LienMenu {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  end?: boolean;
 }
 
+const LIENS: LienMenu[] = [
+  { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, end: true },
+  { to: "/admin/inscriptions", label: "Inscriptions", icon: ClipboardList },
+  { to: "/admin/paiements", label: "Paiements", icon: CreditCard },
+  { to: "/admin/utilisateurs", label: "Utilisateurs", icon: Users },
+  { to: "/admin/formations", label: "Formations", icon: GraduationCap },
+  { to: "/admin/affectations", label: "Affectations", icon: UserCheck },
+  { to: "/admin/statistiques", label: "Statistiques", icon: TrendingUp },
+  { to: "/admin/profil", label: "Mon profil", icon: User },
+];
+
+function AdminLayout() {
+  const { user, logout } = useAuth();
+
+  function handleLogout() {
+    logout("/");
+  }
+
   function linkClass({ isActive }: { isActive: boolean }) {
-    return `flex items-center rounded-xl px-4 py-3 text-sm font-medium transition ${
+    return `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
       isActive
         ? "bg-slate-800 text-cyan-300"
         : "text-slate-300 hover:bg-slate-900 hover:text-white"
@@ -32,34 +61,13 @@ function handleLogout() {
           </p>
         </div>
 
-       <nav className="flex-1 space-y-2 px-4 py-6">
-        <NavLink to="/admin" end className={linkClass}>
-            Tableau de bord
-        </NavLink>
-
-         <NavLink to="/admin/inscriptions" className={linkClass}>
-            Inscriptions
-        </NavLink>
-
-        <NavLink to="/admin/paiements" className={linkClass}>
-            Paiements
-        </NavLink>
-
-        <NavLink to="/admin/utilisateurs" className={linkClass}>
-            Utilisateurs
-        </NavLink>
-
-        <NavLink to="/admin/formations" className={linkClass}>
-            Formations
-        </NavLink>
-
-        <NavLink to="/admin/affectations" className={linkClass}>
-            Affectations
-        </NavLink>
-
-        <NavLink to="/admin/profil" className={linkClass}>
-            Mon profil
-        </NavLink>
+        <nav className="flex-1 space-y-2 px-4 py-6">
+          {LIENS.map(({ to, label, icon: Icone, end }) => (
+            <NavLink key={to} to={to} end={end} className={linkClass}>
+              <Icone size={18} className="shrink-0" />
+              {label}
+            </NavLink>
+          ))}
         </nav>
 
         <div className="border-t border-slate-800 p-4">
@@ -76,8 +84,9 @@ function handleLogout() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-white"
           >
+            <LogOut size={18} />
             Déconnexion
           </button>
         </div>
