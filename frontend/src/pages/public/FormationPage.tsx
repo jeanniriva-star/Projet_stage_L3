@@ -25,6 +25,7 @@ const DOMAINES_PRO = [
 
 function FormationCard({ formation }: { formation: Formation }) {
   const estContinue = formation.type === "CONTINUE";
+  const estTerminee = formation.statut === "TERMINEE";
 
   return (
     <article
@@ -34,7 +35,7 @@ function FormationCard({ formation }: { formation: Formation }) {
           : "border-slate-200"
       }`}
     >
-      <div className="mb-5">
+      <div className="mb-5 flex flex-wrap items-center gap-2">
         <span
           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
             estContinue
@@ -45,6 +46,12 @@ function FormationCard({ formation }: { formation: Formation }) {
           {formatType(formation.type)}
           {formation.niveau ? ` · ${formation.niveau}` : ""}
         </span>
+
+        {estTerminee && (
+          <span className="inline-flex rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+            Terminée
+          </span>
+        )}
       </div>
 
       <h3 className="text-xl font-bold text-slate-900">{formation.titre}</h3>
@@ -76,12 +83,22 @@ function FormationCard({ formation }: { formation: Formation }) {
           Voir détails
         </Link>
 
+        {estTerminee ? (
+          <button
+            type="button"
+            disabled
+            className="flex-1 cursor-not-allowed rounded-xl bg-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-500"
+          >
+            Inscriptions fermées
+          </button>
+        ) : (
           <BoutonInscription
-          formationId={formation.id}
-          className="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
-        >
-          S'inscrire
-        </BoutonInscription>
+            formationId={formation.id}
+            className="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
+          >
+            S'inscrire
+          </BoutonInscription>
+        )}
       </div>
     </article>
   );

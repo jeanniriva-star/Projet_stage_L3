@@ -54,11 +54,19 @@ function FormationDetailPage() {
     <div className="min-h-screen bg-slate-50">
       <section className="bg-slate-900 px-6 py-16 text-white">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700">
-          <span className="text-base">◈</span>
-          Formation {formatType(formation.type).toLowerCase()}
-          {formation.niveau ? ` · ${formation.niveau}` : ""}
-        </div>
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700">
+              <span className="text-base">◈</span>
+              Formation {formatType(formation.type).toLowerCase()}
+              {formation.niveau ? ` · ${formation.niveau}` : ""}
+            </div>
+
+            {formation.statut === "TERMINEE" && (
+              <span className="rounded-full bg-slate-700 px-3 py-1 text-sm font-semibold text-slate-100">
+                Terminée
+              </span>
+            )}
+          </div>
 
           <h1 className="mt-5 text-4xl font-bold sm:text-5xl">
             {formation.titre}
@@ -100,12 +108,18 @@ function FormationDetailPage() {
             {formatPrix(formation.prix)}
           </p>
 
+          {formation.statut === "TERMINEE" ? (
+            <p className="mt-6 rounded-xl bg-slate-100 px-5 py-3 text-center text-sm font-semibold text-slate-500">
+              Formation terminée : inscriptions fermées
+            </p>
+          ) : (
             <BoutonInscription
-            formationId={formation.id}
-            className="mt-6 block w-full rounded-xl bg-slate-900 px-5 py-3 text-center font-semibold text-white transition hover:bg-cyan-700"
-          >
-            S'inscrire à cette formation
-          </BoutonInscription>
+              formationId={formation.id}
+              className="mt-6 block w-full rounded-xl bg-slate-900 px-5 py-3 text-center font-semibold text-white transition hover:bg-cyan-700"
+            >
+              S'inscrire à cette formation
+            </BoutonInscription>
+          )}
 
           <Link
             to="/formations"
