@@ -863,6 +863,15 @@ export async function deleteUser(
           },
         });
 
+        // 4 bis. CERTIFICATS
+        await tx.certificat.deleteMany({
+          where: {
+            inscriptionId: {
+              in: inscriptionIds,
+            },
+          },
+        });
+        
         // 5. INSCRIPTIONS
         await tx.inscription.deleteMany({
           where: {

@@ -121,3 +121,8 @@ export type ReponseQCM = Prisma.ReponseQCMModel
  * 
  */
 export type Paiement = Prisma.PaiementModel
+/**
+ * Model Certificat
+ * 
+ */
+export type Certificat = Prisma.CertificatModel

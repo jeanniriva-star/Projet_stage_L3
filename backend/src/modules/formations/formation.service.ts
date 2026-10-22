@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma.js";
+import { randomBytes } from "node:crypto";
 
 interface CreateFormationData {
   titre: string;
@@ -84,6 +85,8 @@ export async function getFormationById(id: string) {
       prix: true,
       type: true,
       niveau: true,
+      statut: true,
+      termineeLe: true,
       createdAt: true,
       updatedAt: true,
 
@@ -268,6 +271,8 @@ export async function getFormationsPagines(
         prix: true,
         type: true,
         niveau: true,
+        statut: true,
+        termineeLe: true,
         createdAt: true,
         updatedAt: true,
 
@@ -328,4 +333,189 @@ interface UpdateFormationData {
   prix?: number;
   type?: "CONTINUE" | "PROFESSIONNELLE";
   niveau?: "L1" | "L2" | "L3" | "M1" | "M2" | null;
+}
+
+// ======================================================
+// FIN DE FORMATION ET CERTIFICATS
+// ======================================================
+
+// 70 % de la note maximale (20) = 14/20
+const SEUIL_REUSSITE = 14;
+
+function genererNumeroCertificat() {
+  const date = new Date()
+    .toISOString()
+    .slice(0, 10)
+    .replace(/-/g, "");
+
+  const suffixe = randomBytes(4).toString("hex").toUpperCase();
+
+  // Exemple : CERT-20261022-1A2B3C4D
+  return `CERT-${date}-${suffixe}`;
+}
+
+// Moyenne des notes de chaque apprenant dont l'inscription est validée
+async function calculerResultatsFormation(
+  client: Pick<typeof prisma, "inscription">,
+  formationId: string
+) {
+  const inscriptions = await client.inscription.findMany({
+    where: {
+      formationId,
+      statut: "VALIDEE",
+    },
+
+    orderBy: {
+      dateInscription: "asc",
+    },
+
+    select: {
+      id: true,
+
+      apprenant: {
+        select: {
+          id: true,
+          nom: true,
+          prenom: true,
+          email: true,
+        },
+      },
+
+      certificat: {
+        select: {
+          id: true,
+        },
+      },
+
+      soumissions: {
+        select: {
+          note: true,
+        },
+      },
+    },
+  });
+
+  return inscriptions.map((inscription) => {
+    const notes = inscription.soumissions
+      .map((soumission) => soumission.note)
+      .filter((note): note is number => note !== null);
+
+    const moyenne =
+      notes.length > 0
+        ? Math.round(
+            (notes.reduce((somme, note) => somme + note, 0) /
+              notes.length) *
+              100
+          ) / 100
+        : null;
+
+    return {
+      inscriptionId: inscription.id,
+      apprenant: inscription.apprenant,
+      nombreQcm: notes.length,
+      moyenne,
+      reussi: moyenne !== null && moyenne >= SEUIL_REUSSITE,
+      aDejaCertificat: inscription.certificat !== null,
+    };
+  });
+}
+
+// Aperçu affiché à l'admin avant de confirmer la fin de la formation
+export async function getApercuFinFormation(formationId: string) {
+  const formation = await prisma.formation.findUnique({
+    where: {
+      id: formationId,
+    },
+
+    select: {
+      id: true,
+      titre: true,
+      statut: true,
+      termineeLe: true,
+    },
+  });
+
+  if (!formation) {
+    throw new Error("Formation introuvable");
+  }
+
+  const resultats = await calculerResultatsFormation(
+    prisma,
+    formationId
+  );
+
+  return {
+    formation,
+    seuil: SEUIL_REUSSITE,
+    eligibles: resultats.filter((resultat) => resultat.reussi),
+    nonEligibles: resultats.filter((resultat) => !resultat.reussi),
+  };
+}
+
+// Termine la formation et délivre les certificats, en une seule transaction
+export async function terminerFormation(formationId: string) {
+  return prisma.$transaction(async (tx) => {
+    const formation = await tx.formation.findUnique({
+      where: {
+        id: formationId,
+      },
+
+      select: {
+        id: true,
+        statut: true,
+      },
+    });
+
+    if (!formation) {
+      throw new Error("Formation introuvable");
+    }
+
+    if (formation.statut === "TERMINEE") {
+      throw new Error("Cette formation est déjà terminée");
+    }
+
+    const resultats = await calculerResultatsFormation(
+      tx,
+      formationId
+    );
+
+    const reussis = resultats.filter(
+      (resultat) => resultat.reussi && !resultat.aDejaCertificat
+    );
+
+    const formationTerminee = await tx.formation.update({
+      where: {
+        id: formationId,
+      },
+
+      data: {
+        statut: "TERMINEE",
+        termineeLe: new Date(),
+      },
+
+      select: {
+        id: true,
+        titre: true,
+        statut: true,
+        termineeLe: true,
+      },
+    });
+
+    if (reussis.length > 0) {
+      await tx.certificat.createMany({
+        data: reussis.map((resultat) => ({
+          numero: genererNumeroCertificat(),
+          inscriptionId: resultat.inscriptionId,
+          moyenne: resultat.moyenne ?? 0,
+        })),
+      });
+    }
+
+    return {
+      message: "Formation terminée avec succès",
+      formation: formationTerminee,
+      nombreApprenants: resultats.length,
+      certificatsDelivres: reussis.length,
+    };
+  });
 }

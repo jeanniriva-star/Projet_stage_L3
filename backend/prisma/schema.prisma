@@ -33,6 +33,10 @@ enum StatutSession {
   EN_COURS
   TERMINEE
 }
+enum StatutFormation {
+  EN_COURS
+  TERMINEE
+}
 enum TypeFormation {
   CONTINUE
   PROFESSIONNELLE
@@ -92,6 +96,8 @@ model Formation {
   prix Decimal @default(0) @db.Decimal(10, 2)
   type   TypeFormation       @default(PROFESSIONNELLE)
   niveau NiveauUniversitaire?
+  statut     StatutFormation @default(EN_COURS)
+  termineeLe DateTime?
 
   createurId String
   createur   User   @relation("CreateurFormation", fields: [createurId], references: [id])
@@ -222,6 +228,7 @@ model Inscription {
   progressions ProgressionCours[]
   soumissions  SoumissionEvaluation[]
   paiements    Paiement[]
+  certificat   Certificat?
 
   @@unique([apprenantId, formationId])
 }
@@ -397,4 +404,24 @@ model Paiement {
   updatedAt DateTime @updatedAt
 
   @@index([inscriptionId])
+}
+
+// ======================================================
+// CERTIFICAT
+// ======================================================
+
+model Certificat {
+  id String @id @default(uuid())
+
+  // Référence lisible, unique (exemple : CERT-20261022-A1B2C3)
+  numero String @unique
+
+  // Un seul certificat par inscription
+  inscriptionId String      @unique
+  inscription   Inscription @relation(fields: [inscriptionId], references: [id])
+
+  // Moyenne des QCM (sur 20) au moment de la fin de la formation
+  moyenne Float
+
+  delivreLe DateTime @default(now())
 }

@@ -83,7 +83,8 @@ export const ModelName = {
     Choix: 'Choix',
     SoumissionEvaluation: 'SoumissionEvaluation',
     ReponseQCM: 'ReponseQCM',
-    Paiement: 'Paiement'
+    Paiement: 'Paiement',
+    Certificat: 'Certificat'
 };
 /**
  * Enums
@@ -113,6 +114,8 @@ export const FormationScalarFieldEnum = {
     prix: 'prix',
     type: 'type',
     niveau: 'niveau',
+    statut: 'statut',
+    termineeLe: 'termineeLe',
     createurId: 'createurId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -230,6 +233,13 @@ export const PaiementScalarFieldEnum = {
     confirmeAt: 'confirmeAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+export const CertificatScalarFieldEnum = {
+    id: 'id',
+    numero: 'numero',
+    inscriptionId: 'inscriptionId',
+    moyenne: 'moyenne',
+    delivreLe: 'delivreLe'
 };
 export const SortOrder = {
     asc: 'asc',

@@ -82,7 +82,15 @@ export async function soumettreQCM(
     },
 
     include: {
-      cours: true,
+            cours: {
+        include: {
+          formation: {
+            select: {
+              statut: true,
+            },
+          },
+        },
+      },
 
       questions: {
         include: {
@@ -100,6 +108,11 @@ export async function soumettreQCM(
     throw new Error("Cette évaluation n'est pas un QCM");
   }
 
+    if (evaluation.cours.formation.statut === "TERMINEE") {
+    throw new Error(
+      "Cette formation est terminée : les évaluations sont fermées"
+    );
+  }
   if (evaluation.questions.length === 0) {
     throw new Error("Cette évaluation ne contient aucune question");
   }

@@ -191,7 +191,7 @@ export type ReponseQCMOrderByWithRelationInput = {
 
 export type ReponseQCMWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  soumissionId_questionId?: Prisma.ReponseQCMSoumissionIdQuestionIdCompoundUniqueInput
+  soumissionId_questionId_choixId?: Prisma.ReponseQCMSoumissionIdQuestionIdChoixIdCompoundUniqueInput
   AND?: Prisma.ReponseQCMWhereInput | Prisma.ReponseQCMWhereInput[]
   OR?: Prisma.ReponseQCMWhereInput[]
   NOT?: Prisma.ReponseQCMWhereInput | Prisma.ReponseQCMWhereInput[]
@@ -201,7 +201,7 @@ export type ReponseQCMWhereUniqueInput = Prisma.AtLeast<{
   soumission?: Prisma.XOR<Prisma.SoumissionEvaluationScalarRelationFilter, Prisma.SoumissionEvaluationWhereInput>
   question?: Prisma.XOR<Prisma.QuestionScalarRelationFilter, Prisma.QuestionWhereInput>
   choix?: Prisma.XOR<Prisma.ChoixScalarRelationFilter, Prisma.ChoixWhereInput>
-}, "id" | "soumissionId_questionId">
+}, "id" | "soumissionId_questionId_choixId">
 
 export type ReponseQCMOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -279,9 +279,10 @@ export type ReponseQCMOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ReponseQCMSoumissionIdQuestionIdCompoundUniqueInput = {
+export type ReponseQCMSoumissionIdQuestionIdChoixIdCompoundUniqueInput = {
   soumissionId: string
   questionId: string
+  choixId: string
 }
 
 export type ReponseQCMCountOrderByAggregateInput = {

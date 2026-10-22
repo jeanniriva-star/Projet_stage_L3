@@ -1,18 +1,8 @@
 import { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 // =====================================================
-// TYPES (réponse de GET /dashboard/admin)
+// TYPES (réponse de GET /dashboard/admin/statistiques)
 // =====================================================
 
 export interface StatApprenant {
@@ -43,7 +33,7 @@ const VUES: { valeur: Vue; label: string; description: string }[] = [
     valeur: "FREQUENTATION",
     label: "Fréquentation",
     description:
-      "Nombre d'apprenants inscrits (inscriptions validées) par formation.",
+      "Listes des formations qui sont plus aux moins suivis par rapport aux nombres des apprenants.",
   },
   {
     valeur: "NOTES",
@@ -61,82 +51,110 @@ const VUES: { valeur: Vue; label: string; description: string }[] = [
 
 const SEUIL_NOTE = 10;
 const BLEU = "#0e7490";
-const ORANGE = "#d97706";
 const ROUGE = "#dc2626";
+const GRIS = "#94a3b8";
 
-interface Barre {
-  nom: string;
-  valeur: number;
-  couleur: string;
-}
-
-function raccourcir(texte: string, longueur = 24) {
-  return texte.length > longueur
-    ? `${texte.slice(0, longueur - 1)}…`
-    : texte;
-}
+// Une couleur par part de l'anneau ; le reste est regroupé en "Autres"
+const PALETTE = ["#0e7490", "#06b6d4", "#7c3aed", "#d97706", "#db2777", "#16a34a"];
+const MAX_TRANCHES = PALETTE.length;
 
 function couleurNote(note: number) {
   return note < SEUIL_NOTE ? ROUGE : BLEU;
 }
 
-// =====================================================
-// GRAPHIQUE EN BARRES HORIZONTALES
-// =====================================================
-
-interface BarresProps {
-  donnees: Barre[];
-  libelle: string;
-  unite?: string;
-  max?: number;
-  seuil?: number;
+function pluriel(nombre: number, mot: string) {
+  return `${nombre} ${mot}${nombre > 1 ? "s" : ""}`;
 }
 
-function Barres({ donnees, libelle, unite = "", max, seuil }: BarresProps) {
+// =====================================================
+// JAUGE CIRCULAIRE (note sur 20)
+// =====================================================
+
+function Jauge({ valeur, max = 20 }: { valeur: number; max?: number }) {
+  const rayon = 40;
+  const circonference = 2 * Math.PI * rayon;
+  const ratio = Math.min(Math.max(valeur / max, 0), 1);
+
   return (
-    <div style={{ height: Math.max(220, donnees.length * 44 + 40) }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={donnees}
-          layout="vertical"
-          margin={{ top: 5, right: 24, left: 8, bottom: 5 }}
+    <svg
+      width="104"
+      height="104"
+      viewBox="0 0 100 100"
+      role="img"
+      aria-label={`${valeur} sur ${max}`}
+    >
+      <circle
+        cx="50"
+        cy="50"
+        r={rayon}
+        fill="none"
+        stroke="#e2e8f0"
+        strokeWidth="10"
+      />
+
+      <circle
+        cx="50"
+        cy="50"
+        r={rayon}
+        fill="none"
+        stroke={couleurNote(valeur)}
+        strokeWidth="10"
+        strokeLinecap={ratio === 0 ? "butt" : "round"}
+        strokeDasharray={`${circonference * ratio} ${circonference}`}
+        transform="rotate(-90 50 50)"
+      />
+
+      <text
+        x="50"
+        y="46"
+        textAnchor="middle"
+        dominantBaseline="central"
+        style={{ fontSize: 22, fontWeight: 700, fill: "#0f172a" }}
+      >
+        {valeur}
+      </text>
+
+      <text
+        x="50"
+        y="66"
+        textAnchor="middle"
+        dominantBaseline="central"
+        style={{ fontSize: 11, fill: "#64748b" }}
+      >
+        /{max}
+      </text>
+    </svg>
+  );
+}
+
+interface ElementJauge {
+  cle: string;
+  nom: string;
+  valeur: number;
+  detail: string;
+}
+
+function GrilleJauges({ elements }: { elements: ElementJauge[] }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {elements.map((element) => (
+        <div
+          key={element.cle}
+          className={`flex flex-col items-center rounded-2xl border p-5 text-center ${
+            element.valeur < SEUIL_NOTE
+              ? "border-red-200 bg-red-50"
+              : "border-slate-200 bg-white"
+          }`}
         >
-          <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+          <Jauge valeur={element.valeur} />
 
-          <XAxis
-            type="number"
-            domain={[0, max ?? "auto"]}
-            allowDecimals={false}
-          />
+          <p className="mt-3 text-sm font-semibold text-slate-900">
+            {element.nom}
+          </p>
 
-          <YAxis
-            type="category"
-            dataKey="nom"
-            width={170}
-            tick={{ fontSize: 12 }}
-            tickFormatter={(valeur: string) => raccourcir(valeur)}
-          />
-
-          <Tooltip
-            cursor={{ fill: "#f1f5f9" }}
-            formatter={(valeur) => [`${valeur}${unite}`, libelle]}
-          />
-
-          {seuil !== undefined && (
-            <ReferenceLine
-              x={seuil}
-              stroke={ROUGE}
-              strokeDasharray="4 4"
-            />
-          )}
-
-          <Bar dataKey="valeur" radius={[0, 6, 6, 0]}>
-            {donnees.map((barre, index) => (
-              <Cell key={index} fill={barre.couleur} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+          <p className="mt-1 text-xs text-slate-500">{element.detail}</p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -157,36 +175,43 @@ function StatsFormations({ stats }: { stats: StatFormation[] }) {
   const [vue, setVue] = useState<Vue>("FREQUENTATION");
   const [formationId, setFormationId] = useState("");
 
-  // ---------- Fréquentation (stats est déjà triée, les plus suivies d'abord)
-  const plusSuivies: Barre[] = stats.slice(0, 5).map((formation) => ({
-    nom: formation.titre,
-    valeur: formation.inscritsValides,
-    couleur: BLEU,
-  }));
+  // ---------- Fréquentation (stats est déjà triée : les plus suivies d'abord)
+  const avecInscrits = stats.filter(
+    (formation) => formation.inscritsValides > 0
+  );
 
-  // Les moins suivies, sans reprendre celles déjà dans le haut du classement
-  const moinsSuivies: Barre[] = stats
-    .slice(5)
-    .slice(-5)
-    .reverse()
-    .map((formation) => ({
+  const totalInscrits = avecInscrits.reduce(
+    (somme, formation) => somme + formation.inscritsValides,
+    0
+  );
+
+  const tranches = avecInscrits.slice(0, MAX_TRANCHES).map(
+    (formation, index) => ({
       nom: formation.titre,
       valeur: formation.inscritsValides,
-      couleur: formation.inscritsValides === 0 ? ROUGE : ORANGE,
-    }));
+      couleur: PALETTE[index],
+    })
+  );
+
+  const autres = avecInscrits
+    .slice(MAX_TRANCHES)
+    .reduce((somme, formation) => somme + formation.inscritsValides, 0);
+
+  if (autres > 0) {
+    tranches.push({ nom: "Autres formations", valeur: autres, couleur: GRIS });
+  }
+
+  function couleurRang(index: number, inscrits: number) {
+    return inscrits > 0 && index < MAX_TRANCHES ? PALETTE[index] : GRIS;
+  }
 
   // ---------- Notes par formation
-  const notes: Barre[] = stats
+  const notes = stats
     .filter((formation) => formation.noteMoyenne !== null)
-    .sort((a, b) => (b.noteMoyenne ?? 0) - (a.noteMoyenne ?? 0))
-    .map((formation) => ({
-      nom: formation.titre,
-      valeur: formation.noteMoyenne ?? 0,
-      couleur: couleurNote(formation.noteMoyenne ?? 0),
-    }));
+    .sort((a, b) => (b.noteMoyenne ?? 0) - (a.noteMoyenne ?? 0));
 
   const formationsAAmeliorer = notes.filter(
-    (barre) => barre.valeur < SEUIL_NOTE
+    (formation) => (formation.noteMoyenne ?? 0) < SEUIL_NOTE
   );
 
   // ---------- Progression : moyenne des QCM par apprenant
@@ -198,14 +223,6 @@ function StatsFormations({ stats }: { stats: StatFormation[] }) {
     formationsAvecApprenants.find(
       (formation) => formation.id === formationId
     ) ?? formationsAvecApprenants[0];
-
-  const progression: Barre[] = (formationChoisie?.apprenants ?? []).map(
-    (apprenant) => ({
-      nom: `${apprenant.prenom} ${apprenant.nom}`,
-      valeur: apprenant.moyenne ?? 0,
-      couleur: couleurNote(apprenant.moyenne ?? 0),
-    })
-  );
 
   const vueActive = VUES.find((item) => item.valeur === vue);
 
@@ -245,58 +262,143 @@ function StatsFormations({ stats }: { stats: StatFormation[] }) {
           <Vide texte="Aucune formation pour le moment." />
         )}
 
-        {/* FRÉQUENTATION */}
+        {/* FRÉQUENTATION : anneau + classement */}
         {stats.length > 0 && vue === "FREQUENTATION" && (
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div>
-              <h3 className="mb-3 font-semibold text-slate-900">
-                Les plus suivies
-              </h3>
+          <>
+            {totalInscrits === 0 ? (
+              <Vide texte="Aucun inscrit validé pour le moment." />
+            ) : (
+              <div className="grid items-center gap-8 lg:grid-cols-[320px_1fr]">
+                <div className="relative mx-auto h-72 w-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={tranches}
+                        dataKey="valeur"
+                        nameKey="nom"
+                        innerRadius="60%"
+                        outerRadius="92%"
+                        paddingAngle={2}
+                        stroke="none"
+                      >
+                        {tranches.map((tranche, index) => (
+                          <Cell key={index} fill={tranche.couleur} />
+                        ))}
+                      </Pie>
 
-              <Barres
-                donnees={plusSuivies}
-                libelle="Inscrits"
-              />
-            </div>
+                      <Tooltip
+                        formatter={(valeur, nom) => [
+                          pluriel(Number(valeur), "inscrit"),
+                          String(nom),
+                        ]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
 
-            <div>
-              <h3 className="mb-3 font-semibold text-slate-900">
-                Les moins suivies
-              </h3>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="text-3xl font-bold text-slate-900">
+                      {totalInscrits}
+                    </p>
 
-              {moinsSuivies.length === 0 ? (
-                <Vide texte="Pas assez de formations pour distinguer les moins suivies." />
-              ) : (
-                <Barres
-                  donnees={moinsSuivies}
-                  libelle="Inscrits"
-                />
-              )}
-            </div>
-          </div>
+                    <p className="text-xs text-slate-500">
+                      inscrit{totalInscrits > 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="max-h-80 space-y-2 overflow-y-auto pr-1">
+                  {stats.map((formation, index) => {
+                    const part = Math.round(
+                      (formation.inscritsValides / totalInscrits) * 1000
+                    ) / 10;
+
+                    const estPremiere =
+                      index === 0 && formation.inscritsValides > 0;
+
+                    const estDerniere =
+                      index === stats.length - 1 && stats.length > 1;
+
+                    return (
+                      <li
+                        key={formation.id}
+                        className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3"
+                      >
+                        <span
+                          className="h-3 w-3 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: couleurRang(
+                              index,
+                              formation.inscritsValides
+                            ),
+                          }}
+                        />
+
+                        <span
+                          className="min-w-0 flex-1 truncate text-sm font-medium text-slate-900"
+                          title={formation.titre}
+                        >
+                          {formation.titre}
+                        </span>
+
+                        {estPremiere && (
+                          <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            Plus suivie
+                          </span>
+                        )}
+
+                        {estDerniere && formation.inscritsValides === 0 && (
+                          <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                            Aucun inscrit
+                          </span>
+                        )}
+
+                        {estDerniere && formation.inscritsValides > 0 && (
+                          <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                            Moins suivie
+                          </span>
+                        )}
+
+                        <span className="shrink-0 text-sm text-slate-600">
+                          <strong className="text-slate-900">
+                            {formation.inscritsValides}
+                          </strong>
+                          {" · "}
+                          {part}%
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </>
         )}
 
-        {/* NOTES */}
+        {/* NOTES : une jauge par formation */}
         {stats.length > 0 && vue === "NOTES" && (
           <>
             {notes.length === 0 ? (
               <Vide texte="Aucune note de QCM pour le moment." />
             ) : (
               <>
-                <Barres
-                  donnees={notes}
-                  libelle="Moyenne"
-                  unite="/20"
-                  max={20}
-                  seuil={SEUIL_NOTE}
+                <GrilleJauges
+                  elements={notes.map((formation) => ({
+                    cle: formation.id,
+                    nom: formation.titre,
+                    valeur: formation.noteMoyenne ?? 0,
+                    detail: `${pluriel(
+                      formation.nombreSoumissions,
+                      "QCM passé"
+                    )} · ${pluriel(formation.inscritsValides, "inscrit")}`,
+                  }))}
                 />
 
                 {formationsAAmeliorer.length > 0 && (
-                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <strong>À améliorer</strong> (moyenne inférieure à{" "}
                     {SEUIL_NOTE}/20) :{" "}
                     {formationsAAmeliorer
-                      .map((barre) => barre.nom)
+                      .map((formation) => formation.titre)
                       .join(", ")}
                   </div>
                 )}
@@ -305,7 +407,7 @@ function StatsFormations({ stats }: { stats: StatFormation[] }) {
           </>
         )}
 
-        {/* PROGRESSION */}
+        {/* PROGRESSION : une jauge par apprenant */}
         {stats.length > 0 && vue === "PROGRESSION" && (
           <>
             {!formationChoisie ? (
@@ -326,22 +428,24 @@ function StatsFormations({ stats }: { stats: StatFormation[] }) {
                   </select>
 
                   <p className="text-sm text-slate-500">
-                    {progression.length} apprenant
-                    {progression.length > 1 ? "s" : ""} · moyenne de la
-                    formation :{" "}
+                    {pluriel(formationChoisie.apprenants.length, "apprenant")}
+                    {" · "}moyenne de la formation :{" "}
                     <strong className="text-slate-900">
                       {formationChoisie.noteMoyenne}/20
                     </strong>
                   </p>
                 </div>
 
-                <div className="mt-4">
-                  <Barres
-                    donnees={progression}
-                    libelle="Moyenne des QCM"
-                    unite="/20"
-                    max={20}
-                    seuil={SEUIL_NOTE}
+                <div className="mt-5">
+                  <GrilleJauges
+                    elements={formationChoisie.apprenants.map(
+                      (apprenant) => ({
+                        cle: apprenant.id,
+                        nom: `${apprenant.prenom} ${apprenant.nom}`,
+                        valeur: apprenant.moyenne ?? 0,
+                        detail: pluriel(apprenant.nombreQcm, "QCM passé"),
+                      })
+                    )}
                   />
                 </div>
               </>

@@ -82,12 +82,16 @@ export async function initierPaiement(apprenantId, data) {
                     id: true,
                     titre: true,
                     prix: true,
+                    statut: true,
                 },
             },
         },
     });
     if (!inscription) {
         throw new Error("Inscription introuvable : inscrivez-vous d'abord à la formation");
+    }
+    if (inscription.formation.statut === "TERMINEE") {
+        throw new Error("Cette formation est terminée : paiement impossible");
     }
     if (inscription.statut !== "EN_ATTENTE") {
         throw new Error("Cette inscription n'est plus en attente : paiement impossible");

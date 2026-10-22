@@ -26,6 +26,10 @@ export const StatutSession = {
     EN_COURS: 'EN_COURS',
     TERMINEE: 'TERMINEE'
 };
+export const StatutFormation = {
+    EN_COURS: 'EN_COURS',
+    TERMINEE: 'TERMINEE'
+};
 export const TypeFormation = {
     CONTINUE: 'CONTINUE',
     PROFESSIONNELLE: 'PROFESSIONNELLE'

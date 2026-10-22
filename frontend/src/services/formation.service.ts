@@ -1,6 +1,7 @@
 import api from "../api/axios";
 export type TypeFormation = "CONTINUE" | "PROFESSIONNELLE";
 export type NiveauUniversitaire = "L1" | "L2" | "L3" | "M1" | "M2";
+export type StatutFormation = "EN_COURS" | "TERMINEE";
 
 export interface Formation {
   id: string;
@@ -9,6 +10,8 @@ export interface Formation {
   prix: string, 
   type: TypeFormation;
   niveau: NiveauUniversitaire | null;
+  statut: StatutFormation;
+  termineeLe: string | null;
   createdAt: string;
   updatedAt: string;
 
@@ -75,6 +78,8 @@ export interface FormationAdmin {
   prix: string,
   type: TypeFormation;
   niveau: NiveauUniversitaire | null;
+  statut: StatutFormation;
+  termineeLe: string | null;
   createdAt: string;
   updatedAt: string;
 
@@ -186,6 +191,8 @@ export interface FormationDetailAdmin {
   prix: string,
   type: TypeFormation;
   niveau: NiveauUniversitaire | null;
+  statut: StatutFormation;
+  termineeLe: string | null;
   createdAt: string;
   updatedAt: string;
 
@@ -215,4 +222,73 @@ export async function getFormationDetailAdmin(
     );
 
   return response.data.formation;
+}
+
+// ======================================================
+// FIN DE FORMATION ET CERTIFICATS (ADMIN)
+// ======================================================
+
+export interface ResultatApprenantFin {
+  inscriptionId: string;
+
+  apprenant: {
+    id: string;
+    nom: string;
+    prenom: string;
+    email: string;
+  };
+
+  nombreQcm: number;
+  moyenne: number | null;
+  reussi: boolean;
+  aDejaCertificat: boolean;
+}
+
+export interface ApercuFinFormation {
+  formation: {
+    id: string;
+    titre: string;
+    statut: StatutFormation;
+    termineeLe: string | null;
+  };
+
+  seuil: number;
+  eligibles: ResultatApprenantFin[];
+  nonEligibles: ResultatApprenantFin[];
+}
+
+export async function getApercuFinFormation(
+  formationId: string
+) {
+  const response =
+    await api.get<ApercuFinFormation>(
+      `/formations/${formationId}/fin/apercu`
+    );
+
+  return response.data;
+}
+
+export interface ResultatFinFormation {
+  message: string;
+
+  formation: {
+    id: string;
+    titre: string;
+    statut: StatutFormation;
+    termineeLe: string | null;
+  };
+
+  nombreApprenants: number;
+  certificatsDelivres: number;
+}
+
+export async function terminerFormationAdmin(
+  formationId: string
+) {
+  const response =
+    await api.post<ResultatFinFormation>(
+      `/formations/${formationId}/terminer`
+    );
+
+  return response.data;
 }

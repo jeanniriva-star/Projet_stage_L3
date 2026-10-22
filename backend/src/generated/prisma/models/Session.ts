@@ -507,10 +507,6 @@ export type EnumStatutSessionFieldUpdateOperationsInput = {
   set?: $Enums.StatutSession
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type SessionCreateNestedOneWithoutPresencesInput = {
   create?: Prisma.XOR<Prisma.SessionCreateWithoutPresencesInput, Prisma.SessionUncheckedCreateWithoutPresencesInput>
   connectOrCreate?: Prisma.SessionCreateOrConnectWithoutPresencesInput

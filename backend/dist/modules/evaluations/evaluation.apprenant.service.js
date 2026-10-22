@@ -50,7 +50,15 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
             id: evaluationId,
         },
         include: {
-            cours: true,
+            cours: {
+                include: {
+                    formation: {
+                        select: {
+                            statut: true,
+                        },
+                    },
+                },
+            },
             questions: {
                 include: {
                     choix: true,
@@ -63,6 +71,9 @@ export async function soumettreQCM(evaluationId, apprenantId, reponses) {
     }
     if (evaluation.type !== "QCM") {
         throw new Error("Cette évaluation n'est pas un QCM");
+    }
+    if (evaluation.cours.formation.statut === "TERMINEE") {
+        throw new Error("Cette formation est terminée : les évaluations sont fermées");
     }
     if (evaluation.questions.length === 0) {
         throw new Error("Cette évaluation ne contient aucune question");

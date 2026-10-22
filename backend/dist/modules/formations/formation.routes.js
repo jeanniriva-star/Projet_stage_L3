@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createFormation, getFormations, getFormationById, updateFormation, deleteFormation, } from "./formation.controller.js";
+import { createFormation, getFormations, getFormationById, updateFormation, deleteFormation, getApercuFinFormation, terminerFormation, } from "./formation.controller.js";
 import { validate } from "../../middlewares/validate.middleware.js";
 import { createFormationSchema, updateFormationSchema, } from "../../validators/formation.schema.js";
 import { authenticate } from "../../middlewares/auth.middleware.js";
@@ -10,5 +10,7 @@ router.get("/", getFormations);
 router.get("/:id", getFormationById);
 router.patch("/:id", authenticate, authorize("ADMIN"), validate(updateFormationSchema), updateFormation);
 router.delete("/:id", authenticate, authorize("ADMIN"), deleteFormation);
+router.get("/:id/fin/apercu", authenticate, authorize("ADMIN"), getApercuFinFormation);
+router.post("/:id/terminer", authenticate, authorize("ADMIN"), terminerFormation);
 export default router;
 //# sourceMappingURL=formation.routes.js.map

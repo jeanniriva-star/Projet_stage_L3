@@ -5,6 +5,8 @@ import {
   getFormationById,
   updateFormation,
   deleteFormation,
+  getApercuFinFormation,
+  terminerFormation,
 } from "./formation.controller.js";
 import { validate } from "../../middlewares/validate.middleware.js";
 import {
@@ -48,5 +50,19 @@ router.delete(
   authenticate,
   authorize("ADMIN"),
   deleteFormation
+);
+
+router.get(
+  "/:id/fin/apercu",
+  authenticate,
+  authorize("ADMIN"),
+  getApercuFinFormation
+);
+
+router.post(
+  "/:id/terminer",
+  authenticate,
+  authorize("ADMIN"),
+  terminerFormation
 );
 export default router;

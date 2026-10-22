@@ -11,6 +11,9 @@ export async function createInscription(apprenantId, formationId) {
     if (!formation) {
         throw new Error("Formation introuvable");
     }
+    if (formation.statut === "TERMINEE") {
+        throw new Error("Cette formation est terminée : les inscriptions sont fermées");
+    }
     // Vérifier si l'apprenant est déjà inscrit
     const existingInscription = await prisma.inscription.findUnique({
         where: {

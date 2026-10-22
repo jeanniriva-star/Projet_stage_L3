@@ -66,7 +66,8 @@ export const ModelName = {
   Choix: 'Choix',
   SoumissionEvaluation: 'SoumissionEvaluation',
   ReponseQCM: 'ReponseQCM',
-  Paiement: 'Paiement'
+  Paiement: 'Paiement',
+  Certificat: 'Certificat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -108,6 +109,8 @@ export const FormationScalarFieldEnum = {
   prix: 'prix',
   type: 'type',
   niveau: 'niveau',
+  statut: 'statut',
+  termineeLe: 'termineeLe',
   createurId: 'createurId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -284,6 +287,17 @@ export const PaiementScalarFieldEnum = {
 } as const
 
 export type PaiementScalarFieldEnum = (typeof PaiementScalarFieldEnum)[keyof typeof PaiementScalarFieldEnum]
+
+
+export const CertificatScalarFieldEnum = {
+  id: 'id',
+  numero: 'numero',
+  inscriptionId: 'inscriptionId',
+  moyenne: 'moyenne',
+  delivreLe: 'delivreLe'
+} as const
+
+export type CertificatScalarFieldEnum = (typeof CertificatScalarFieldEnum)[keyof typeof CertificatScalarFieldEnum]
 
 
 export const SortOrder = {

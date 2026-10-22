@@ -284,3 +284,79 @@ export async function deleteFormation(
     });
   }
 }
+
+export async function getApercuFinFormation(
+  req: Request,
+  res: Response
+) {
+  try {
+    const id = req.params.id;
+
+    if (typeof id !== "string") {
+      return res.status(400).json({
+        message: "Identifiant de formation invalide",
+      });
+    }
+
+    const apercu =
+      await formationService.getApercuFinFormation(id);
+
+    return res.status(200).json(apercu);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Erreur interne du serveur";
+
+    if (message === "Formation introuvable") {
+      return res.status(404).json({
+        message,
+      });
+    }
+
+    return res.status(500).json({
+      message,
+    });
+  }
+}
+
+export async function terminerFormation(
+  req: Request,
+  res: Response
+) {
+  try {
+    const id = req.params.id;
+
+    if (typeof id !== "string") {
+      return res.status(400).json({
+        message: "Identifiant de formation invalide",
+      });
+    }
+
+    const resultat =
+      await formationService.terminerFormation(id);
+
+    return res.status(200).json(resultat);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Erreur interne du serveur";
+
+    if (message === "Formation introuvable") {
+      return res.status(404).json({
+        message,
+      });
+    }
+
+    if (message === "Cette formation est déjà terminée") {
+      return res.status(409).json({
+        message,
+      });
+    }
+
+    return res.status(500).json({
+      message,
+    });
+  }
+}

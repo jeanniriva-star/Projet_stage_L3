@@ -412,7 +412,8 @@ export const ModelName = {
   Choix: 'Choix',
   SoumissionEvaluation: 'SoumissionEvaluation',
   ReponseQCM: 'ReponseQCM',
-  Paiement: 'Paiement'
+  Paiement: 'Paiement',
+  Certificat: 'Certificat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -428,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "formation" | "affectationFormateur" | "cours" | "exercice" | "ressourcePedagogique" | "session" | "inscription" | "presence" | "progressionCours" | "evaluation" | "question" | "choix" | "soumissionEvaluation" | "reponseQCM" | "paiement"
+    modelProps: "user" | "formation" | "affectationFormateur" | "cours" | "exercice" | "ressourcePedagogique" | "session" | "inscription" | "presence" | "progressionCours" | "evaluation" | "question" | "choix" | "soumissionEvaluation" | "reponseQCM" | "paiement" | "certificat"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1616,6 +1617,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Certificat: {
+      payload: Prisma.$CertificatPayload<ExtArgs>
+      fields: Prisma.CertificatFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CertificatFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CertificatFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        findFirst: {
+          args: Prisma.CertificatFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CertificatFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        findMany: {
+          args: Prisma.CertificatFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>[]
+        }
+        create: {
+          args: Prisma.CertificatCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        createMany: {
+          args: Prisma.CertificatCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CertificatCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>[]
+        }
+        delete: {
+          args: Prisma.CertificatDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        update: {
+          args: Prisma.CertificatUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        deleteMany: {
+          args: Prisma.CertificatDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CertificatUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CertificatUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>[]
+        }
+        upsert: {
+          args: Prisma.CertificatUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CertificatPayload>
+        }
+        aggregate: {
+          args: Prisma.CertificatAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCertificat>
+        }
+        groupBy: {
+          args: Prisma.CertificatGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CertificatGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CertificatCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CertificatCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1678,6 +1753,8 @@ export const FormationScalarFieldEnum = {
   prix: 'prix',
   type: 'type',
   niveau: 'niveau',
+  statut: 'statut',
+  termineeLe: 'termineeLe',
   createurId: 'createurId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1856,6 +1933,17 @@ export const PaiementScalarFieldEnum = {
 export type PaiementScalarFieldEnum = (typeof PaiementScalarFieldEnum)[keyof typeof PaiementScalarFieldEnum]
 
 
+export const CertificatScalarFieldEnum = {
+  id: 'id',
+  numero: 'numero',
+  inscriptionId: 'inscriptionId',
+  moyenne: 'moyenne',
+  delivreLe: 'delivreLe'
+} as const
+
+export type CertificatScalarFieldEnum = (typeof CertificatScalarFieldEnum)[keyof typeof CertificatScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1967,6 +2055,20 @@ export type EnumNiveauUniversitaireFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'NiveauUniversitaire[]'
  */
 export type ListEnumNiveauUniversitaireFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NiveauUniversitaire[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StatutFormation'
+ */
+export type EnumStatutFormationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatutFormation'>
+    
+
+
+/**
+ * Reference to a field of type 'StatutFormation[]'
+ */
+export type ListEnumStatutFormationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatutFormation[]'>
     
 
 
@@ -2241,6 +2343,7 @@ export type GlobalOmitConfig = {
   soumissionEvaluation?: Prisma.SoumissionEvaluationOmit
   reponseQCM?: Prisma.ReponseQCMOmit
   paiement?: Prisma.PaiementOmit
+  certificat?: Prisma.CertificatOmit
 }
 
 /* Types for Logging */
