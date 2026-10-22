@@ -347,4 +347,41 @@ export async function getInscriptionsByFormation(params) {
         },
     };
 }
+export async function getMesCertificats(apprenantId) {
+    return prisma.certificat.findMany({
+        where: {
+            inscription: {
+                apprenantId,
+            },
+        },
+        orderBy: {
+            delivreLe: "desc",
+        },
+        select: {
+            id: true,
+            numero: true,
+            moyenne: true,
+            delivreLe: true,
+            inscription: {
+                select: {
+                    apprenant: {
+                        select: {
+                            nom: true,
+                            prenom: true,
+                        },
+                    },
+                    formation: {
+                        select: {
+                            id: true,
+                            titre: true,
+                            type: true,
+                            niveau: true,
+                            termineeLe: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+}
 //# sourceMappingURL=inscription.service.js.map

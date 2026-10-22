@@ -44,6 +44,7 @@ import SessionsFormateurPage from "./pages/formateur/SessionsFormateurPage";
 import AdminLayout from "./layouts/AdminLayout";
 import PaiementsAdminPage from "./pages/admin/PaiementsAdminPage";
 import StatistiquesAdminPage from "./pages/admin/StatistiquesAdminPage";
+import CertificatsPage from "./pages/apprenant/CertificatsPage";
 
 
 function App() {
@@ -212,6 +213,10 @@ function App() {
     <Route
       path="/apprenant/resultats"
       element={<ResultatsPage />}
+    />
+        <Route
+      path="/apprenant/certificats"
+      element={<CertificatsPage />}
     />
 
     <Route

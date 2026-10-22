@@ -3,10 +3,10 @@ import { createInscription,
     getInscriptionsEnAttente,
       updateStatutInscription,
      getMesInscriptions,
+     getMesCertificats,
   getInscriptionsByFormation,
 
 } from "./inscription.controller.js";
-
 import { authenticate } from "../../middlewares/auth.middleware.js";
 import { authorize } from "../../middlewares/role.middleware.js";
 
@@ -37,6 +37,13 @@ router.get(
   authenticate,
   authorize("APPRENANT"),
   getMesInscriptions
+);
+
+router.get(
+  "/inscriptions/mes-certificats",
+  authenticate,
+  authorize("APPRENANT"),
+  getMesCertificats
 );
 
 router.get(

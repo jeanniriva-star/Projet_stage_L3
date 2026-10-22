@@ -105,6 +105,36 @@ export async function demarrerInscription(
 
   return null;
 }
+
+export interface MonCertificat {
+  id: string;
+  numero: string;
+  moyenne: number;
+  delivreLe: string;
+
+  inscription: {
+    apprenant: {
+      nom: string;
+      prenom: string;
+    };
+
+    formation: {
+      id: string;
+      titre: string;
+      type: "CONTINUE" | "PROFESSIONNELLE";
+      niveau: string | null;
+      termineeLe: string | null;
+    };
+  };
+}
+
+export async function getMesCertificats() {
+  const response = await api.get<{ certificats: MonCertificat[] }>(
+    "/inscriptions/mes-certificats"
+  );
+
+  return response.data.certificats;
+}
 // ======================================================
 // ADMIN - INSCRIPTIONS EN ATTENTE
 // ======================================================
@@ -210,3 +240,4 @@ export async function updateStatutInscription(
 
   return response.data;
 }
+

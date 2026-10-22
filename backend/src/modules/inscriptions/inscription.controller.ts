@@ -313,3 +313,34 @@ export async function getInscriptionsByFormation(
     });
   }
 }
+
+export async function getMesCertificats(
+  req: Request,
+  res: Response
+) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Non authentifié",
+      });
+    }
+
+    const certificats =
+      await inscriptionService.getMesCertificats(
+        req.user.id
+      );
+
+    return res.status(200).json({
+      certificats,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Erreur interne du serveur";
+
+    return res.status(500).json({
+      message,
+    });
+  }
+}

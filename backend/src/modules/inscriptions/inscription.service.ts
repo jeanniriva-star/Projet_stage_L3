@@ -489,3 +489,44 @@ interface GetInscriptionsFormationParams {
   statut?: "EN_ATTENTE" | "VALIDEE" | "REFUSEE";
 }
 
+export async function getMesCertificats(apprenantId: string) {
+  return prisma.certificat.findMany({
+    where: {
+      inscription: {
+        apprenantId,
+      },
+    },
+
+    orderBy: {
+      delivreLe: "desc",
+    },
+
+    select: {
+      id: true,
+      numero: true,
+      moyenne: true,
+      delivreLe: true,
+
+      inscription: {
+        select: {
+          apprenant: {
+            select: {
+              nom: true,
+              prenom: true,
+            },
+          },
+
+          formation: {
+            select: {
+              id: true,
+              titre: true,
+              type: true,
+              niveau: true,
+              termineeLe: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
