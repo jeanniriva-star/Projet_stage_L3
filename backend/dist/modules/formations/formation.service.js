@@ -173,7 +173,7 @@ export async function deleteFormation(id) {
     };
 }
 export async function getFormationsPagines(params) {
-    const { page, limit, search, } = params;
+    const { page, limit, search, statut, } = params;
     const skip = (page - 1) * limit;
     const where = {
         ...(search !== undefined &&
@@ -192,6 +192,9 @@ export async function getFormationsPagines(params) {
                     },
                 },
             ],
+        }),
+        ...(statut !== undefined && {
+            statut,
         }),
     };
     const [formations, total,] = await Promise.all([

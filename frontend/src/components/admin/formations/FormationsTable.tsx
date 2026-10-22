@@ -15,6 +15,10 @@ const COLONNES = [
   { label: "Actions", align: "text-right" },
 ];
 
+function formaterDate(date: string) {
+  return new Date(date).toLocaleDateString("fr-FR");
+}
+
 type Props = {
   formations: FormationAdmin[];
   deletingId: string | null;
@@ -48,13 +52,24 @@ function FormationsTable({
           <tbody className="divide-y divide-slate-100">
             {formations.map((formation) => (
               <tr key={formation.id} className="hover:bg-slate-50">
-                <td className="px-5 py-4">
-                  <Link
-                    to={`/admin/formations/${formation.id}`}
-                    className="font-semibold text-slate-900 transition hover:text-cyan-700"
-                  >
-                    {formation.titre}
-                  </Link>
+                                <td className="px-5 py-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      to={`/admin/formations/${formation.id}`}
+                      className="font-semibold text-slate-900 transition hover:text-cyan-700"
+                    >
+                      {formation.titre}
+                    </Link>
+
+                    {formation.statut === "TERMINEE" && (
+                      <span className="whitespace-nowrap rounded-full bg-slate-900 px-2.5 py-0.5 text-xs font-semibold text-cyan-300">
+                        Terminée
+                        {formation.termineeLe
+                          ? ` · ${formaterDate(formation.termineeLe)}`
+                          : ""}
+                      </span>
+                    )}
+                  </div>
 
                   {formation.description && (
                     <p className="mt-1 max-w-xs truncate text-sm text-slate-500">

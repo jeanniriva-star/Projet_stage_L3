@@ -114,7 +114,8 @@ export interface FormationsAdminResponse {
 export async function getFormationsAdmin(
   page = 1,
   limit = 10,
-  search = ""
+  search = "",
+  statut: StatutFormation | "" = ""
 ) {
   const response =
     await api.get<FormationsAdminResponse>(
@@ -126,6 +127,10 @@ export async function getFormationsAdmin(
 
           ...(search.trim() && {
             search: search.trim(),
+          }),
+
+          ...(statut && {
+            statut,
           }),
         },
       }

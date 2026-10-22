@@ -39,6 +39,7 @@ export async function getFormations(req, res) {
         const pageRaw = req.query.page;
         const limitRaw = req.query.limit;
         const searchRaw = req.query.search;
+        const statutRaw = req.query.statut;
         const page = typeof pageRaw === "string"
             ? Number(pageRaw)
             : 1;
@@ -61,11 +62,20 @@ export async function getFormations(req, res) {
         const search = typeof searchRaw === "string"
             ? searchRaw.trim()
             : undefined;
+        const statut = statutRaw === "EN_COURS" || statutRaw === "TERMINEE"
+            ? statutRaw
+            : undefined;
         const resultat = await formationService.getFormationsPagines({
             page,
             limit,
             ...(search && {
                 search,
+            }),
+            ...(search && {
+                search,
+            }),
+            ...(statut && {
+                statut,
             }),
         });
         return res.status(200).json(resultat);

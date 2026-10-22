@@ -5,7 +5,10 @@ import FormationEditModal from "../../components/admin/formations/FormationEditM
 import FormationsTable from "../../components/admin/formations/FormationsTable";
 import { useFormationForm } from "../../hooks/admin/useFormationForm";
 import { useFormationsAdmin } from "../../hooks/admin/useFormationsAdmin";
-import type { FormationAdmin } from "../../services/formation.service";
+import type {
+  FormationAdmin,
+  StatutFormation,
+} from "../../services/formation.service";
 
 function FormationsAdminPage() {
   const {
@@ -14,6 +17,8 @@ function FormationsAdminPage() {
     error,
     recherche,
     setRecherche,
+    statutFiltre,
+    changerStatut,
     page,
     totalPages,
     total,
@@ -112,6 +117,20 @@ function FormationsAdminPage() {
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-cyan-600"
             />
 
+                        <select
+              value={statutFiltre}
+              onChange={(event) =>
+                void changerStatut(
+                  event.target.value as StatutFormation | ""
+                )
+              }
+              className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-600 sm:w-48"
+            >
+              <option value="">Toutes</option>
+              <option value="EN_COURS">En cours</option>
+              <option value="TERMINEE">Terminées</option>
+            </select>
+
             <button
               type="submit"
               className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
@@ -119,7 +138,7 @@ function FormationsAdminPage() {
               Rechercher
             </button>
 
-            {recherche && (
+              {(recherche || statutFiltre) && (
               <button
                 type="button"
                 onClick={reinitialiserRecherche}

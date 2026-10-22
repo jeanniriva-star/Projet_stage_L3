@@ -1,5 +1,6 @@
 import prisma from "../../config/prisma.js";
 import { randomBytes } from "node:crypto";
+import type { StatutFormation } from "../../generated/prisma/enums.js";
 
 interface CreateFormationData {
   titre: string;
@@ -217,6 +218,7 @@ interface GetFormationsParams {
   page: number;
   limit: number;
   search?: string;
+  statut?: StatutFormation;
 }
 
 export async function getFormationsPagines(
@@ -226,6 +228,7 @@ export async function getFormationsPagines(
     page,
     limit,
     search,
+    statut,
   } = params;
 
   const skip = (page - 1) * limit;
@@ -248,6 +251,9 @@ export async function getFormationsPagines(
           },
         ],
       }),
+          ...(statut !== undefined && {
+      statut,
+    }),
   };
 
   const [

@@ -8,6 +8,7 @@ import {
   type FormationAdmin,
   type FormationsAdminResponse,
   type NiveauUniversitaire,
+  type StatutFormation,
 } from "../../services/formation.service";
 import { getErrorMessage } from "../../utils/errors";
 import type { FormationFormValues } from "./useFormationForm";
@@ -21,6 +22,7 @@ export function useFormationsAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [recherche, setRecherche] = useState("");
+  const [statutFiltre, setStatutFiltre] = useState<StatutFormation | "">("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -40,9 +42,10 @@ export function useFormationsAdmin() {
     setTotal(data.pagination.total);
   }, []);
 
-  async function chargerFormations(
+    async function chargerFormations(
     pageDemandee = page,
-    rechercheDemandee = recherche
+    rechercheDemandee = recherche,
+    statutDemande = statutFiltre
   ) {
     try {
       setLoading(true);
@@ -51,7 +54,8 @@ export function useFormationsAdmin() {
       const data = await getFormationsAdmin(
         pageDemandee,
         LIMITE_PAR_PAGE,
-        rechercheDemandee
+        rechercheDemandee,
+        statutDemande
       );
 
       appliquerResultat(data);
@@ -109,10 +113,17 @@ export function useFormationsAdmin() {
     await chargerFormations(1, recherche);
   }
 
-  function reinitialiserRecherche() {
+    function reinitialiserRecherche() {
     setRecherche("");
+    setStatutFiltre("");
 
-    void chargerFormations(1, "");
+    void chargerFormations(1, "", "");
+  }
+
+  async function changerStatut(statut: StatutFormation | "") {
+    setStatutFiltre(statut);
+
+    await chargerFormations(1, recherche, statut);
   }
 
   // =====================================================
@@ -242,6 +253,8 @@ export function useFormationsAdmin() {
     error,
     recherche,
     setRecherche,
+    statutFiltre,
+    changerStatut,
     page,
     totalPages,
     total,
