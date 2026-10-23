@@ -87,6 +87,13 @@ function FormationDetailPage() {
           <p className="mt-4 leading-7 text-slate-600">
             {formation.description || "Aucune information supplémentaire."}
           </p>
+            {formation.type === "CONTINUE" && formation.niveau && (
+            <p className="mt-4 rounded-xl bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
+              Cette formation est destinée aux étudiants de{" "}
+              <strong>{formation.niveau}</strong> : tous les cours du niveau{" "}
+              {formation.niveau} y sont traités.
+            </p>
+          )}
 
           <div className="mt-8 flex gap-6 text-sm text-slate-600">
             <span>

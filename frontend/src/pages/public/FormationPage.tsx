@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Footer from "../../components/Footer";
-import { formatPrix, formatType, NIVEAUX } from "../../utils/format";
 import BoutonInscription from "../../components/BoutonInscription";
+import { formatPrix, NIVEAUX } from "../../utils/format";
 
 import {
   getFormations,
@@ -17,65 +17,94 @@ const ONGLETS: { valeur: Onglet; label: string }[] = [
   { valeur: "PROFESSIONNELLE", label: "Formation professionnelle" },
 ];
 
-const DOMAINES_PRO = [
-  "Administration Système et Réseaux",
-  "Développement d'application",
-  "Outillages",
-];
+// Classe les parcours de L1 à M2
+function rangNiveau(niveau: string | null) {
+  const index = niveau ? (NIVEAUX as readonly string[]).indexOf(niveau) : -1;
 
-function FormationCard({ formation }: { formation: Formation }) {
-  const estContinue = formation.type === "CONTINUE";
+  return index === -1 ? NIVEAUX.length : index;
+}
+
+// =====================================================
+// CARTE : FORMATION CONTINUE (une par niveau)
+// =====================================================
+
+function ParcoursCard({ formation }: { formation: Formation }) {
   const estTerminee = formation.statut === "TERMINEE";
 
   return (
-    <article
-      className={`group rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg ${
-        estContinue
-          ? "border-cyan-200 border-l-4 border-l-cyan-500"
-          : "border-slate-200"
-      }`}
-    >
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-            estContinue
-              ? "bg-cyan-100 text-cyan-700"
-              : "bg-slate-900 text-cyan-300"
-          }`}
-        >
-          {formatType(formation.type)}
-          {formation.niveau ? ` · ${formation.niveau}` : ""}
-        </span>
+    <article className="flex flex-col gap-3 rounded-2xl border border-cyan-200 border-l-4 border-l-cyan-500 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Formation continue pour les
+        </p>
 
         {estTerminee && (
-          <span className="inline-flex rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+          <span className="shrink-0 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
             Terminée
           </span>
         )}
       </div>
 
+      <p className="text-5xl font-extrabold leading-none text-slate-900">
+        {formation.niveau ?? formation.titre}
+      </p>
+
+      <p className="flex-1 text-sm leading-6 text-slate-600">
+        {formation.niveau
+          ? `Tous les cours du niveau ${formation.niveau} sont traités dans cette formation.`
+          : formation.description || "Aucune description disponible."}
+      </p>
+
+      <p className="border-t border-slate-100 pt-3 font-bold text-slate-900">
+        Prix : {formatPrix(formation.prix)}
+      </p>
+
+      {estTerminee ? (
+        <button
+          type="button"
+          disabled
+          className="block w-full cursor-not-allowed rounded-xl bg-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-500"
+        >
+          Inscriptions fermées
+        </button>
+      ) : (
+        <BoutonInscription
+          formationId={formation.id}
+          className="block w-full rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-cyan-700"
+        >
+          S'inscrire
+        </BoutonInscription>
+      )}
+    </article>
+  );
+}
+
+// =====================================================
+// CARTE : FORMATION PROFESSIONNELLE
+// =====================================================
+
+function FormationCard({ formation }: { formation: Formation }) {
+  const estTerminee = formation.statut === "TERMINEE";
+
+  return (
+    <article className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      {estTerminee && (
+        <span className="self-start rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+          Terminée
+        </span>
+      )}
+
       <h3 className="text-xl font-bold text-slate-900">{formation.titre}</h3>
 
-      <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
+      <p className="line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
         {formation.description || "Aucune description disponible."}
       </p>
 
-      <div className="mt-4 flex gap-4 text-sm text-slate-500">
-        <span>{formation._count.cours} cours</span>
-        <span>{formation._count.sessions} sessions</span>
-      </div>
+      <p className="border-t border-slate-100 pt-3 font-bold text-slate-900">
+        Prix : {formatPrix(formation.prix)}
+      </p>
 
-      <div className="mt-6 border-t border-slate-100 pt-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-          Prix
-        </p>
-
-        <p className="mt-1 font-bold text-slate-900">
-          {formatPrix(formation.prix)}
-        </p>
-      </div>
-
-      <div className="mt-6 flex gap-3">
+      <div className="flex gap-3">
         <Link
           to={`/formation/${formation.id}`}
           className="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:border-cyan-500 hover:text-cyan-700"
@@ -103,6 +132,10 @@ function FormationCard({ formation }: { formation: Formation }) {
     </article>
   );
 }
+
+// =====================================================
+// PAGE
+// =====================================================
 
 function FormationsPage() {
   const [formations, setFormations] = useState<Formation[]>([]);
@@ -133,7 +166,11 @@ function FormationsPage() {
     chargerFormations();
   }, []);
 
-  const continues = formations.filter((f) => f.type === "CONTINUE");
+  // Formations continues classées de L1 à M2
+  const continues = formations
+    .filter((f) => f.type === "CONTINUE")
+    .sort((a, b) => rangNiveau(a.niveau) - rangNiveau(b.niveau));
+
   const professionnelles = formations.filter(
     (f) => f.type === "PROFESSIONNELLE"
   );
@@ -215,7 +252,8 @@ function FormationsPage() {
                     Cours d'appui pour aider les étudiants universitaires à
                     renforcer leurs connaissances, réussir leur parcours
                     académique et se préparer efficacement à leur avenir
-                    professionnel.
+                    professionnel. Une formation est proposée pour chaque
+                    niveau, de L1 à M2 : choisissez la vôtre et inscrivez-vous.
                   </p>
                 </div>
 
@@ -224,37 +262,13 @@ function FormationsPage() {
                     Aucune formation continue disponible pour le moment.
                   </p>
                 ) : (
-                  <div className="mt-8 space-y-10">
-                    {NIVEAUX.map((niveau) => {
-                      const matieres = continues.filter(
-                        (f) => f.niveau === niveau
-                      );
-
-                      if (matieres.length === 0) {
-                        return null;
-                      }
-
-                      return (
-                        <div key={niveau}>
-                          <h3 className="mb-4 text-lg font-bold text-cyan-700">
-                            Niveau {niveau}
-                            <span className="ml-2 text-sm font-medium text-slate-400">
-                              {matieres.length} matière
-                              {matieres.length > 1 ? "s" : ""}
-                            </span>
-                          </h3>
-
-                          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {matieres.map((formation) => (
-                              <FormationCard
-                                key={formation.id}
-                                formation={formation}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {continues.map((formation) => (
+                      <ParcoursCard
+                        key={formation.id}
+                        formation={formation}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
@@ -271,18 +285,9 @@ function FormationsPage() {
                   <p className="mt-3 max-w-3xl text-slate-600">
                     Adaptées à tous, visant à développer des compétences
                     pratiques pour une meilleure évolution de carrière.
+                    Chaque formation est un parcours complet, composé de ses
+                    propres cours.
                   </p>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {DOMAINES_PRO.map((domaine) => (
-                      <span
-                        key={domaine}
-                        className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white"
-                      >
-                        {domaine}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
                 {professionnelles.length === 0 ? (
