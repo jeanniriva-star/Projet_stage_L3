@@ -26,6 +26,11 @@ export async function createFormation(req, res) {
         });
     }
     catch (error) {
+        if (error instanceof formationService.FormationRegleError) {
+            return res.status(error.status).json({
+                message: error.message,
+            });
+        }
         const message = error instanceof Error
             ? error.message
             : "Erreur interne du serveur";
@@ -171,6 +176,11 @@ export async function updateFormation(req, res) {
         });
     }
     catch (error) {
+        if (error instanceof formationService.FormationRegleError) {
+            return res.status(error.status).json({
+                message: error.message,
+            });
+        }
         const message = error instanceof Error
             ? error.message
             : "Erreur interne du serveur";

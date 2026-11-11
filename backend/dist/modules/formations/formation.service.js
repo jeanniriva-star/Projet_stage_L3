@@ -1,13 +1,46 @@
 import prisma from "../../config/prisma.js";
 import { randomBytes } from "node:crypto";
+// Erreur "métier" : le contrôleur la transforme en réponse HTTP (400 ou 409)
+export class FormationRegleError extends Error {
+    status;
+    constructor(message, status = 400) {
+        super(message);
+        this.name = "FormationRegleError";
+        this.status = status;
+    }
+}
+// Règle : une seule formation continue EN_COURS par niveau
+async function verifierUniciteContinue(niveau, excludeId) {
+    const existante = await prisma.formation.findFirst({
+        where: {
+            type: "CONTINUE",
+            niveau,
+            statut: "EN_COURS",
+            ...(excludeId !== undefined && { id: { not: excludeId } }),
+        },
+        select: { titre: true },
+    });
+    if (existante) {
+        throw new FormationRegleError(`Une formation continue est déjà en cours pour le niveau ${niveau} (« ${existante.titre} »). Terminez-la avant d'en créer une autre.`, 409);
+    }
+}
 export async function createFormation(data) {
+    const type = data.type ?? "PROFESSIONNELLE";
+    let niveau = null;
+    if (type === "CONTINUE") {
+        if (!data.niveau) {
+            throw new FormationRegleError("Le niveau est obligatoire pour une formation continue");
+        }
+        niveau = data.niveau;
+        await verifierUniciteContinue(niveau);
+    }
     return prisma.formation.create({
         data: {
             titre: data.titre,
             description: data.description,
             prix: data.prix,
-            type: data.type,
-            niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
+            type,
+            niveau,
             createurId: data.createurId,
         },
         select: {
@@ -17,6 +50,7 @@ export async function createFormation(data) {
             prix: true,
             type: true,
             niveau: true,
+            statut: true,
             createdAt: true,
             updatedAt: true,
             createur: {
@@ -98,30 +132,39 @@ export async function getFormationById(id) {
 // Modification d'une formation
 export async function updateFormation(id, data) {
     const formation = await prisma.formation.findUnique({
-        where: {
-            id,
-        },
+        where: { id },
     });
     if (!formation) {
         throw new Error("Formation introuvable");
     }
+    const typeFinal = data.type ?? formation.type;
+    let niveauFinal = null;
+    if (typeFinal === "CONTINUE") {
+        niveauFinal =
+            data.niveau !== undefined ? data.niveau : formation.niveau;
+        if (!niveauFinal) {
+            throw new FormationRegleError("Le niveau est obligatoire pour une formation continue");
+        }
+    }
+    // Vrai seulement si le type ou le niveau change réellement
+    const changeTypeOuNiveau = typeFinal !== formation.type || niveauFinal !== formation.niveau;
+    if (typeFinal === "CONTINUE" &&
+        niveauFinal &&
+        changeTypeOuNiveau &&
+        formation.statut === "EN_COURS") {
+        await verifierUniciteContinue(niveauFinal, id);
+    }
     return prisma.formation.update({
-        where: {
-            id,
-        },
+        where: { id },
         data: {
-            ...(data.titre !== undefined && {
-                titre: data.titre,
-            }),
+            ...(data.titre !== undefined && { titre: data.titre }),
             ...(data.description !== undefined && {
                 description: data.description,
             }),
-            ...(data.prix !== undefined && {
-                prix: data.prix,
-            }),
-            ...(data.type !== undefined && {
-                type: data.type,
-                niveau: data.type === "CONTINUE" ? (data.niveau ?? null) : null,
+            ...(data.prix !== undefined && { prix: data.prix }),
+            ...(changeTypeOuNiveau && {
+                type: typeFinal,
+                niveau: niveauFinal,
             }),
         },
         select: {
@@ -131,6 +174,7 @@ export async function updateFormation(id, data) {
             prix: true,
             type: true,
             niveau: true,
+            statut: true,
             createdAt: true,
             updatedAt: true,
         },

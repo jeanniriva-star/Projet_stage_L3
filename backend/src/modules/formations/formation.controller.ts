@@ -30,7 +30,13 @@ export async function createFormation(req: Request, res: Response) {
       message: "Formation créée avec succès",
       formation,
     });
-  } catch (error) {
+   } catch (error) {
+    if (error instanceof formationService.FormationRegleError) {
+      return res.status(error.status).json({
+        message: error.message,
+      });
+    }
+
     const message =
       error instanceof Error
         ? error.message
@@ -233,6 +239,11 @@ if (
       formation,
     });
   } catch (error) {
+        if (error instanceof formationService.FormationRegleError) {
+      return res.status(error.status).json({
+        message: error.message,
+      });
+    }
     const message =
       error instanceof Error
         ? error.message
